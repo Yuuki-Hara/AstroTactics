@@ -65,19 +65,9 @@ class RunManager {
     
     // MARK: - JSONファイルの読み込み処理
     private func loadMapData() {
-        // MapData.json というファイルを探す
-        guard let url = Bundle.main.url(forResource: "MapData", withExtension: "json"),
-              let data = try? Data(contentsOf: url) else {
-            print("⚠️ MapData.json が見つかりません！")
-            return
-        }
-        
-        // JSONデータをSwiftの MapData に変換！
-        do {
-            let decodedData = try JSONDecoder().decode(MapData.self, from: data)
+        if let decodedData = DataLoader.load("MapData", as: MapData.self) {
             self.mapFloors = decodedData.floors
-        } catch {
-            print("⚠️ マップの読み込みに失敗しました: \(error)")
+            print("✅ マップデータを読み込みました！")
         }
     }
 }

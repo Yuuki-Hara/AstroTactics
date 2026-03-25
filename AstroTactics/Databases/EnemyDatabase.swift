@@ -41,14 +41,10 @@ struct EnemyDatabase {
     
     // 🌟 アプリ起動時にJSONを読み込む関数
     static func loadFromJSON() {
-        guard let url = Bundle.main.url(forResource: "EnemyData", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let catalog = try? JSONDecoder().decode(EnemyCatalog.self, from: data) else {
-            print("⚠️ EnemyData.json の読み込みに失敗しました！")
-            return
+        if let catalog = DataLoader.load("EnemyData", as: EnemyCatalog.self) {
+            allEnemiesData = catalog.enemies
+            print("✅ 敵データを \(allEnemiesData.count) 件読み込みました！")
         }
-        allEnemiesData = catalog.enemies
-        print("✅ 敵データを \(allEnemiesData.count) 件読み込みました！")
     }
     
     // MARK: - 敵の生成

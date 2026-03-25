@@ -32,18 +32,12 @@ struct CardDatabase {
     
     // 🌟 アプリ起動時にJSONを読み込む関数
     static func loadFromJSON() {
-        guard let url = Bundle.main.url(forResource: "CardData", withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let catalog = try? JSONDecoder().decode(CardCatalog.self, from: data) else {
-            print("⚠️ CardData.json の読み込みに失敗しました！")
-            return
+        // DataLoaderに「CardData.jsonを、CardCatalog型で読み込んで！」と頼むだけ！
+        if let catalog = DataLoader.load("CardData", as: CardCatalog.self) {
+            allCardsData = catalog.cards.map { convert(json: $0) }
+            print("✅ カードデータを \(allCardsData.count) 件読み込みました！")
         }
-        
-        // JSONのデータを、実際のCardオブジェクトに変換（翻訳）して保存する
-        allCardsData = catalog.cards.map { convert(json: $0) }
-        print("✅ カードデータを \(allCardsData.count) 件読み込みました！")
     }
-    
     // 🌟 翻訳機：JSONの文字を、Swiftのプログラムに変換する
     static private func convert(json: CardJSON) -> Card {
         // 1. 属性（traits）の翻訳
