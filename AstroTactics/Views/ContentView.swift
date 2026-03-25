@@ -13,6 +13,7 @@ enum AppState {
     case map
     case battle
     case reward
+    case gameClear
 }
 
 struct ContentView: View {
@@ -53,13 +54,16 @@ struct ContentView: View {
             
         // ⚔️ バトル画面
         case .battle:
-            if let manager = battleManager {
+            if let manager = battleManager, let run = runManager {
                 BattleView(manager: manager, onRestart: {
                     // 🌟 勝利・敗北時の処理が大きく変わります！
                     if manager.currentState == .victory {
                         // 勝ったらマップを進めて、マップ画面に戻る！
-                        runManager?.advanceToNextNode()
-                        appState = .reward
+                        if run.currentNode?.type == .boss {
+                            appState = .gameClear
+                        } else {
+                            appState = .reward
+                        }
                     } else {
                         // 負けたらゲームオーバー（タイトルへ）
                         appState = .title
@@ -74,6 +78,11 @@ struct ContentView: View {
                     appState = .map
                 })
             }
+        case .gameClear:
+            GameClearView(onReturnToTitle: {
+                runManager = nil
+                appState = .title
+            })
         }
     }
     
