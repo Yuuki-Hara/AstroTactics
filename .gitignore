@@ -1,0 +1,45 @@
+# --- macOS ---
+.DS_Store
+*.swp
+*.lock
+
+# --- Xcode ---
+# ユーザー固有の設定（ビルド履歴やウィンドウ配置など）
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.playground.xcworkspace
+
+# 各自の環境に依存するデータ（GitHubに上げるとコンフリクトの元になります）
+xcuserdata/
+
+# プロジェクトのレイアウトや状態
+*.xccheckout
+*.moved-aside
+*.xcuserstate
+*.xcscmblueprint
+
+# --- Swift Package Manager ---
+.build/
+.swiftpm/
+# Package.resolved は共有するのが一般的ですが、ライブラリ開発でない場合は除外することもあります
+# Package.resolved
+
+# --- CocoaPods (もし使っている場合) ---
+# Podsディレクトリは重いため除外して、各自で pod install するのが推奨です
+# Pods/
+# *.xcworkspace (Podsを使うならこれは共有する必要があるため、通常は除外しません)
+
+# --- Carthage (もし使っている場合) ---
+Carthage/Build/
+
+# --- Fastlane (もし使っている場合) ---
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+# --- その他 ---
+# 秘匿情報（APIキーなどを書いた設定ファイルなど）
+*.env
