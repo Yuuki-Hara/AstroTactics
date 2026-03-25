@@ -11,67 +11,114 @@ import SwiftUI
 struct MapView: View {
     var runManager: RunManager
     
-    // 🌟 マスが選ばれた時に、親（ContentView）に「このマスに入ります！」と伝える通信ケーブル
-    var onEnterNode: (MapNode) -> Void
+    // 🌟 マスを選んだ時に親（ContentView）に「ここに行くよ！」と伝えるケーブル
+    var onNodeSelected: (MapNode) -> Void
     
     var body: some View {
         ZStack {
-            Color(red: 0.05, green: 0.05, blue: 0.1).ignoresSafeArea()
+            // 宇宙空間っぽい背景
+            Color(red: 0.1, green: 0.1, blue: 0.2).ignoresSafeArea()
             
-            VStack(spacing: 20) {
-                Text("星域マップ")
-                    .font(.largeTitle).bold()
-                    .foregroundColor(.cyan)
-                    .padding(.top, 40)
-                
-                ScrollView {
-                    VStack(spacing: 40) {
-                        // マップのマスを上から順番に表示する
-                        ForEach(Array(runManager.mapNodes.enumerated()), id: \.element.id) { index, node in
-                            
-                            let isCurrent = index == runManager.currentNodeIndex
-                            let isPast = index < runManager.currentNodeIndex
-                            
-                            // 🌟 1マス分のUI部品
-                            Button(action: {
-                                if isCurrent { onEnterNode(node) }
-                            }) {
-                                HStack {
-                                    Text(node.type.title)
-                                        .font(.title2).bold()
-                                    
-                                    Spacer()
-                                    
-                                    // 状態によって表示を変える
-                                    if isPast {
-                                        Image(systemName: "checkmark.circle.fill")
-                                            .foregroundColor(.green)
-                                    } else if isCurrent {
-                                        Text("現在地")
-                                            .font(.caption).bold()
-                                            .padding(6)
-                                            .background(Color.yellow)
-                                            .foregroundColor(.black)
-                                            .cornerRadius(8)
+            ScrollView(showsIndicators: false) {
+                // 🌟 Slay the Spire風に「下から上へ」進むように見せるため、階層を逆順(.reversed())で並べます！
+                VStack(spacing: 50) {
+                    Text("星域マップ")
+                        .font(.largeTitle).bold()
+                        .foregroundColor(.white)
+                        .padding(.top, 40)
+                    
+                    // 各階層（横の並び）を描画
+                    ForEach(Array(runManager.mapFloors.enumerated().reversed()), id: \.offset) { floorIndex, floorNodes in
+                        HStack(spacing: 20) {
+                            // その階層にあるマスを描画
+                            ForEach(floorNodes) { node in
+                                MapNodeView(
+                                    node: node,
+                                    isCurrent: runManager.currentNodeId == node.id,
+                                    canEnter: runManager.canEnter(node: node) // 👈 JSONの繋がりを見て、入れるか判定！
+                                )
+                                .onTapGesture {
+                                    // 入れるマスなら、タップした時に移動処理を発動！
+                                    if runManager.canEnter(node: node) {
+                                        onNodeSelected(node)
                                     }
                                 }
-                                .padding()
-                                .frame(maxWidth: 300)
-                                // 状態によって色を変える
-                                .background(isCurrent ? Color.cyan.opacity(0.3) : (isPast ? Color.gray.opacity(0.3) : Color.white.opacity(0.1)))
-                                .foregroundColor(isCurrent ? .cyan : (isPast ? .gray : .white))
-                                .cornerRadius(12)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(isCurrent ? Color.cyan : Color.clear, lineWidth: 2)
-                                )
                             }
-                            .disabled(!isCurrent) // 現在地以外は押せないようにする
                         }
                     }
-                    .padding()
                 }
+                .padding(.bottom, 80)
             }
         }
+    }
+}
+
+// 🌟 1つのマス目の見た目を定義する専用の部品
+struct MapNodeView: View {
+    let node: MapNode
+    let isCurrent: Bool
+    let canEnter: Bool
+    
+    var body: some View {
+        // 🌟 修正2：マスの横幅を制限し、重ならないようにする！
+        VStack(spacing: 8) {
+            ZStack {
+                Circle()
+                    .fill(backgroundColor)
+                    .frame(width: 60, height: 60) // 少しだけ円を小さくして余裕を持たせる
+                    .overlay(
+                        Circle().stroke(borderColor, lineWidth: isCurrent ? 4 : 2)
+                    )
+                    // 🌟 修正1：暴走しないように、点滅ではなく「光の強さ（radius）」だけで表現！
+                    .shadow(color: borderColor, radius: isCurrent ? 15 : (canEnter ? 8 : 0))
+                
+                Image(systemName: iconName)
+                    .font(.system(size: 24, weight: .bold)) // Imageでもfontでサイズ調整できます
+                    .foregroundColor(textColor)
+            }
+            
+            Text(node.type.title)
+                .font(.caption).bold()
+                .foregroundColor(textColor)
+                .lineLimit(1) // 🌟 1行に収める
+                .minimumScaleFactor(0.4) // 🌟 狭ければ限界まで文字を小さくして重なりを防ぐ！
+                .frame(maxWidth: 80) // 🌟 横幅の最大値を決めて、隣のマスに侵入させない
+        }
+        // クリア済みや遠い場所は暗くする
+        .opacity(canEnter || isCurrent || node.isCompleted ? 1.0 : 0.4)
+        // 🌟 修正1：点滅（repeatCount）を完全に削除し、スッと大きくなるだけの安全なアニメーションに！
+        .scaleEffect(isCurrent ? 1.2 : (canEnter ? 1.1 : 1.0))
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCurrent)
+        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: canEnter)
+    }
+    
+    // MARK: - 見た目の出し分けロジック
+    private var iconName: String {
+            if node.isCompleted { return "checkmark" } // クリアマーク
+            switch node.type {
+            case .battle: return "bolt.fill"           // 雷マーク（戦闘）
+            case .rest: return "cup.and.saucer.fill"   // コーヒーカップ（休憩）
+            case .boss: return "crown.fill"            // 王冠（ボス）
+            }
+        }
+    
+    private var backgroundColor: Color {
+        if isCurrent { return .yellow.opacity(0.3) }
+        if node.isCompleted { return .green.opacity(0.3) }
+        if canEnter { return .cyan.opacity(0.3) }
+        return .gray.opacity(0.3)
+    }
+    
+    private var borderColor: Color {
+        if isCurrent { return .yellow }
+        if node.isCompleted { return .green }
+        if canEnter { return .cyan }
+        return .gray
+    }
+    
+    private var textColor: Color {
+        if isCurrent { return .yellow }
+        if canEnter { return .cyan }
+        return .gray
     }
 }

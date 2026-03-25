@@ -1,0 +1,16 @@
+{
+  "floors": [
+    [
+      { "id": "floor1_A", "type": "battle", "nextNodeIds": ["floor2_A", "floor2_B"] },
+      { "id": "floor1_B", "type": "battle", "nextNodeIds": ["floor2_B", "floor2_C"] }
+    ],
+    [
+      { "id": "floor2_A", "type": "rest", "nextNodeIds": ["boss_1"] },
+      { "id": "floor2_B", "type": "battle", "nextNodeIds": ["boss_1"] },
+      { "id": "floor2_C", "type": "rest", "nextNodeIds": ["boss_1"] }
+    ],
+    [
+      { "id": "boss_1", "type": "boss", "nextNodeIds": [] }
+    ]
+  ]
+}

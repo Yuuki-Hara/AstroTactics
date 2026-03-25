@@ -11,38 +11,71 @@ import Observation
 
 @Observable
 class RunManager {
-    // 🌟 バトルを跨いでも引き継がれるプレイヤーのデータ
     var player: PlayerShip
     var masterDeck: [Card]
     
-    // 🌟 マップのデータ
-    var mapNodes: [MapNode] = []
-    var currentNodeIndex: Int = 0 // 今マップの何階層目にいるか
+    // 🌟 1次元の配列から、階層ごとの2次元配列（フロア）に変更！
+    var mapFloors: [[MapNode]] = []
+    
+    // 🌟 現在地を「階層の数字」ではなく「今いるマスのID」で記憶する
+    var currentNodeId: String? = nil
     
     init() {
-        // ゲーム開始時の初期ステータス
         self.player = PlayerShip(name: "アストロ旗艦", maxHP: 50, maxEnergy: 3)
         self.masterDeck = CardDatabase.startingDeck()
         
-        // とりあえず最初は「一直線に3つの部屋が並んでいる」シンプルなマップを生成！
-        self.mapNodes = [
-            MapNode(type: .battle), // 1階層目：雑魚戦
-            MapNode(type: .rest),   // 2階層目：休憩所
-            MapNode(type: .boss)    // 3階層目：ボス
-        ]
+        // 🌟 アプリ起動時にJSONファイルを読み込んでマップを作る！
+        loadMapData()
     }
     
-    // 現在いる部屋（ノード）を取得する便利関数
+    // 今いるマスの情報を取得する便利機能
     var currentNode: MapNode? {
-        guard currentNodeIndex < mapNodes.count else { return nil }
-        return mapNodes[currentNodeIndex]
+        guard let id = currentNodeId else { return nil }
+        return mapFloors.flatMap { $0 }.first(where: { $0.id == id })
     }
     
-    // 部屋をクリアして次に進む処理
+    // 🌟 指定したマスが「今タップして進めるマスか？」を判定する機能
+    func canEnter(node: MapNode) -> Bool {
+        // まだ一度もマスに入っていない（スタート地点）なら、1階層目ならどこでも入れる！
+        if currentNodeId == nil {
+            return mapFloors.first?.contains(where: { $0.id == node.id }) ?? false
+        }
+        
+        // すでにどこかのマスにいるなら、そのマスの「次に行けるリスト」に入っていればOK！
+        if let current = currentNode {
+            return current.nextNodeIds.contains(node.id)
+        }
+        
+        return false
+    }
+    
+    // 🌟 マスをクリアした時の処理（現在地を更新するだけ）
     func advanceToNextNode() {
-        if currentNodeIndex < mapNodes.count {
-            mapNodes[currentNodeIndex].isCompleted = true
-            currentNodeIndex += 1
+        if let current = currentNode {
+            // 現在のマスをクリア済みにする（少し複雑ですが、該当するマスを探して更新しています）
+            for floorIndex in 0..<mapFloors.count {
+                if let nodeIndex = mapFloors[floorIndex].firstIndex(where: { $0.id == current.id }) {
+                    mapFloors[floorIndex][nodeIndex].isCompleted = true
+                }
+            }
+        }
+    }
+    
+    // MARK: - JSONファイルの読み込み処理
+    private func loadMapData() {
+        // MapData.json というファイルを探す
+        guard let url = Bundle.main.url(forResource: "MapData", withExtension: "json"),
+              let data = try? Data(contentsOf: url) else {
+            print("⚠️ MapData.json が見つかりません！")
+            return
+        }
+        
+        // JSONデータをSwiftの MapData に変換！
+        do {
+            let decodedData = try JSONDecoder().decode(MapData.self, from: data)
+            self.mapFloors = decodedData.floors
+        } catch {
+            print("⚠️ マップの読み込みに失敗しました: \(error)")
         }
     }
 }
