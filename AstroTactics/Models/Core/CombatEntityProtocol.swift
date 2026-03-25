@@ -53,7 +53,6 @@ extension CombatEntity {
         return (damageToHP: actualDamageToHP, blocked: blockedByShield)
     }
     
-    // 🌟 追加：ターン終了時に状態異常のカウントを減らす処理
     func decrementStatuses() {
         var nextStatuses: [StatusType: Int] = [:]
         

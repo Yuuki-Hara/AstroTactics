@@ -17,15 +17,15 @@ struct RestartView: View {
             .ignoresSafeArea()
         
         VStack(spacing: 30) {
-            Text(isVictory ? "MISSION CLEAR" : "GAME OVER")
+            Text(isVictory ? GameSettings.messages.missionClear : GameSettings.messages.gameOver)
                 .font(.system(size: 44, weight: .black))
                 .foregroundColor(isVictory ? .yellow : .red)
                 .shadow(color: isVictory ? .yellow.opacity(0.5) : .red.opacity(0.5), radius: 10, x: 0, y: 0)
             
             Button(action: {
-                onRestart() // ContentViewに「やり直す！」と伝える
+                onRestart()
             }) {
-                Text("次へ進む")
+                Text(GameSettings.messages.goNext)
                     .font(.title2).bold()
                     .padding()
                     .frame(width: 220)
