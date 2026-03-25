@@ -22,7 +22,7 @@ struct TurnEndButtonView: View {
             // 押されたら、親から渡された処理を実行するだけ！
             action()
         }) {
-            Text("ターン終了")
+            Text(GameSettings.messages.turnEnd)
                 .font(.headline).bold()
                 .padding()
                 // 横幅いっぱいに広げる

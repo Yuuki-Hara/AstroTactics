@@ -1,0 +1,44 @@
+{
+  "cards": [
+    {
+      "baseId": "strike",
+      "name": "通常射撃",
+      "cost": 1,
+      "traits": ["beam"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "damage", "amount": 10 }]
+    },
+    {
+      "baseId": "defend",
+      "name": "基本装甲",
+      "cost": 1,
+      "traits": ["defense"],
+      "target": "selfTarget",
+      "effects": [{ "type": "shield", "amount": 6 }]
+    },
+    {
+      "baseId": "twin_laser",
+      "name": "ツインレーザー",
+      "cost": 1,
+      "traits": ["beam"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "damage", "amount": 4 }, { "type": "damage", "amount": 4 }]
+    },
+    {
+      "baseId": "missile_pod",
+      "name": "拡散ミサイル",
+      "cost": 2,
+      "traits": ["missile"],
+      "target": "allEnemies",
+      "effects": [{ "type": "damageAll", "amount": 8 }]
+    },
+    {
+      "baseId": "reactor_boost",
+      "name": "リアクター暴走",
+      "cost": 0,
+      "traits": ["mech"],
+      "target": "selfTarget",
+      "effects": [{ "type": "energy", "amount": 2 }, { "type": "takeDamage", "amount": 3 }]
+    }
+  ]
+}

@@ -17,28 +17,29 @@ struct RestView: View {
             Color(red: 0.1, green: 0.2, blue: 0.1).ignoresSafeArea()
             
             VStack(spacing: 30) {
-                Text("☕️ 宇宙ステーション")
+                Text(GameSettings.messages.restTitle)
                     .font(.largeTitle).bold()
                     .foregroundColor(.white)
                 
-                Text("安全な宙域に到達した。\n船体を修理し、次の戦いに備えよう。")
+                Text(GameSettings.messages.restDescription)
                     .font(.headline)
                     .foregroundColor(.gray)
                     .multilineTextAlignment(.center)
                 
-                // HPを30%回復するボタン
                 Button(action: {
-                    let healAmount = Int(Double(runManager.player.maxHP) * 0.3)
+                    // 🌟 回復量（0.3など）をJSONから取得！
+                    let healAmount = Int(Double(runManager.player.maxHP) * GameSettings.config.restHealPercentage)
                     runManager.player.currentHP = min(runManager.player.currentHP + healAmount, runManager.player.maxHP)
                     
-                    // 回復したらクリア扱いにしてマップへ戻る
                     runManager.advanceToNextNode()
                     onComplete()
                 }) {
                     VStack {
-                        Text("🛠️ 修理する")
+                        // 🌟 ボタンのテキストもJSONから！
+                        Text(GameSettings.messages.restHealButton)
                             .font(.title2).bold()
-                        Text("HPを30%回復")
+                        let percentValue = Int(GameSettings.config.restHealPercentage * 100)
+                        Text(String(format: GameSettings.messages.restHealSubText, percentValue))
                             .font(.caption)
                     }
                     .foregroundColor(.white)

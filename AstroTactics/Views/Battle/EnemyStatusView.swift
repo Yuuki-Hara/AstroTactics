@@ -39,7 +39,6 @@ struct EnemyStatusView: View {
             Image(enemy.imageName)
                 .resizable()
                 .scaledToFit()
-                // 🌟 変更点2：固定サイズを廃止。「最大120まで、狭ければ勝手に縮む」
                 .frame(maxWidth: 120, maxHeight: 120)
                 .foregroundColor(.red)
                 .padding(.bottom, 4)
@@ -48,12 +47,12 @@ struct EnemyStatusView: View {
             Text(enemy.name)
                 .font(.headline).bold()
                 .foregroundColor(.red)
-                .lineLimit(1) // 🌟 1行に収める
-                .minimumScaleFactor(0.5) // 🌟 狭ければ自動で文字サイズを縮小
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             
             // MARK: - 4. 状態異常とシールド
             if enemy.statuses[.target, default: 0] > 0 {
-                Text("🎯 ターゲット残り \(enemy.statuses[.target]!)")
+                Text("ターゲット残り \(enemy.statuses[.target]!)")
                     .font(.caption2).bold()
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -61,7 +60,7 @@ struct EnemyStatusView: View {
             }
 
             if enemy.shield > 0 {
-                Text("🛡️ シールド: \(enemy.shield)")
+                Text("シールド: \(enemy.shield)")
                     .font(.caption).bold()
                     .foregroundColor(.blue)
             }
@@ -69,23 +68,21 @@ struct EnemyStatusView: View {
             // MARK: - 5. 敵のHPバー
             ProgressView(value: Double(enemy.currentHP), total: Double(enemy.maxHP))
                 .tint(.red)
-                // 🌟 変更点3：余白が大きすぎると潰れるので、小さな余白に変更
                 .padding(.horizontal, 10)
             
             Text("HP: \(enemy.currentHP) / \(enemy.maxHP)")
                 .font(.caption)
                 .foregroundColor(.white)
         }
-        // 🌟 これがレスポンシブの要！HStackの中で均等に幅を分け合うようになります
         .frame(maxWidth: .infinity)
         .padding(.top, 20)
     }
     
     private func intentString(for intent: EnemyIntent) -> String {
         switch intent {
-        case .attack(let damage): return "⚔️ 攻撃: \(damage)"
-        case .defend(let amount): return "🛡️ 防御: \(amount)"
-        case .charge: return "⚠️ エネルギー充填"
+        case .attack(let damage): return "攻撃: \(damage)"
+        case .defend(let amount): return "防御: \(amount)"
+        case .charge: return "エネルギー充填"
         default: return "待機"
         }
     }

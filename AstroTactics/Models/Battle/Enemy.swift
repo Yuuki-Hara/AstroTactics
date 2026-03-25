@@ -22,50 +22,66 @@ class Enemy: CombatEntity, Identifiable {
     var statuses: [StatusType: Int] = [:]
     
     var intent: EnemyIntent?
-    var turnCount: Int = 0 // 🌟 追加：自分が何ターン行動したかを記憶する
+    var turnCount: Int = 0
+    let ai: AIJSON
     
-    init(category: String, name: String, imageName: String, maxHP: Int) {
+    init(category: String, name: String, imageName: String, maxHP: Int, ai: AIJSON) {
         self.category = category
         self.name = name
         self.imageName = imageName
         self.maxHP = maxHP
         self.currentHP = maxHP
+        self.ai = ai
     }
     
-    // 🌟 AIの心臓部：敵の種類（id）によって行動を変える！
     func determineNextIntent() {
         turnCount += 1
+        // もし万が一 JSON の moves が空っぽなら、安全なダミー行動をとって終了する
+        guard !ai.moves.isEmpty else {
+            self.intent = .attack(damage: 1)
+            return
+        }
         
-        switch category {
-        case "flagship":
-            // 💀 ボス専用：恐怖の3ターンローテーションAI
-            let phase = turnCount % 3
-            if phase == 1 {
-                self.intent = .charge            // 1ターン目：充填
-            } else if phase == 2 {
-                self.intent = .attack(damage: 25) // 2ターン目：極大攻撃
-            } else {
-                self.intent = .defend(amount: 20) // 3ターン目(0になります)：絶対防壁
-            }
-        case "scout": // 偵察機：攻撃と防御を交互に繰り返す
-            if turnCount % 2 == 1 {
-                intent = .attack(damage: 8)
-            } else {
-                intent = .defend(amount: 5)
-            }
+        var selectedMove: MoveJSON? = nil
+        
+        if ai.type == "rotation" {
+            // 順番に行動する（ターン数に応じて配列をループさせる）
+            let moveIndex = (turnCount - 1) % ai.moves.count
+            selectedMove = ai.moves[moveIndex]
+        } else {
+            // ランダムに行動する
+            selectedMove = ai.moves.randomElement()
+        }
+        
+        // 選ばれた行動の指示（MoveJSON）を、実際のEnemyIntentに翻訳してセットする！
+        if let move = selectedMove {
+            self.intent = parseMove(move)
+        }
+    }
+    
+    private func parseMove(_ move: MoveJSON) -> EnemyIntent {
+        switch move.intent {
+        case "attack":
+            if let exact = move.amount { return .attack(damage: exact) }
+            let minVal = move.min ?? 1
+            let maxVal = move.max ?? 1
+            let actualMin = min(minVal, maxVal)
+            let actualMax = max(minVal, maxVal)
+            return .attack(damage: Int.random(in: actualMin...actualMax))
             
-        case "cruiser": // 巡洋艦：ひたすら重い一撃を放つ
-            intent = .attack(damage: 15)
+        case "defend":
+            if let exact = move.amount { return .defend(amount: exact) }
+            let minVal = move.min ?? 1
+            let maxVal = move.max ?? 1
+            let actualMin = min(minVal, maxVal)
+            let actualMax = max(minVal, maxVal)
+            return .defend(amount: Int.random(in: actualMin...actualMax))
             
-        case "interceptor": // 迎撃ドローン：3ターンに1回、強力な攻撃！
-            if turnCount % 3 == 0 {
-                intent = .attack(damage: 20)
-            } else {
-                intent = .attack(damage: 5)
-            }
+        case "charge":
+            return .charge
             
         default:
-            intent = .attack(damage: 10)
+            return .attack(damage: 1) // エラー回避用
         }
     }
 }

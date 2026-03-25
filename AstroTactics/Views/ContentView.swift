@@ -98,7 +98,7 @@ struct ContentView: View {
 
         var enemiesToFight: [Enemy] = []
         if run.currentNode?.type == .boss {
-            enemiesToFight.append(EnemyDatabase.bossFlagShip())
+            enemiesToFight.append(EnemyDatabase.bossFlagship())
         } else {
             let enemyCount = Int.random(in: 1...3)
             for _ in 0..<enemyCount {

@@ -17,9 +17,9 @@ enum NodeType: String, Codable {
     // 画面に表示する時のアイコンと名前
     var title: String {
         switch self {
-        case .battle: return "⚔️ 敵艦隊"
-        case .rest: return "☕️ 宇宙ステーション"
-        case .boss: return "💀 ボス旗艦"
+        case .battle: return GameSettings.config.battleFieldName
+        case .rest: return GameSettings.config.restFieldName
+        case .boss: return GameSettings.config.bossFieldName
         }
     }
 }
@@ -28,7 +28,6 @@ struct MapData: Codable {
     let floors: [[MapNode]]
 }
 
-// 🌟 マップ上の1つのマスを表すデータ
 struct MapNode: Identifiable, Codable {
     let id: String
     let type: NodeType

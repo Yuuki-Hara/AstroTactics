@@ -80,8 +80,9 @@ struct BattleView: View {
 // MARK: - プレビュー
 #Preview {
     let player = PlayerShip(name: "アストロ旗艦", maxHP: 50, maxEnergy: 3)
-    let enemy = Enemy(category: "alien", name: "エイリアン偵察機",imageName: "alien_scout" , maxHP: 30)
+    let dummyAI = AIJSON(type: "random", moves: [MoveJSON(intent: "attack", amount: 1, min: nil, max: nil)])
+    let enemy = Enemy(category: "alien", name: "エイリアン偵察機",imageName: "alien_scout" , maxHP: 30, ai: dummyAI)
     let deckManager = BattleDeckManager(startingDeck: CardDatabase.startingDeck())
     let battleManager = BattleManager(player: player, enemies: [enemy], deckManager: deckManager)
-    return BattleView(manager: battleManager, onRestart: {})
+    BattleView(manager: battleManager, onRestart: {})
 }

@@ -11,7 +11,7 @@ import Observation
 @Observable
 class BattleManager {
     var currentState: BattleState = .battleStart
-    var displayMessage: String = "エイリアン艦隊と遭遇"
+    var displayMessage: String = ""
     var player: PlayerShip
     var enemies: [Enemy]
     var deckManager: BattleDeckManager
@@ -72,7 +72,7 @@ class BattleManager {
         turnCount += 1
         player.resetEnergy()
         player.shield = 0
-        await showMessage("あなたのターン", duration: 0.8)
+        await showMessage(GameSettings.messages.playerTurnStart, duration: 0.8)
         await changeState(to: .playerAction)
     }
     
@@ -90,11 +90,10 @@ class BattleManager {
     }
     
     @MainActor private func handleEnemyAction() async {
-        await showMessage("⚠️ 敵の行動！")
+        await showMessage(GameSettings.messages.enemyAction)
         
         for enemy in enemies where enemy.currentHP > 0 {
             guard let intent = enemy.intent else { continue }
-            // 🌟 劇的改善2：敵の行動も別関数に切り出しました
             await executeEnemyIntent(intent, for: enemy)
         }
         
@@ -118,7 +117,7 @@ class BattleManager {
         case .attack(let damage):
             await showMessage(BattleMessageFormatter.enemyAttack(enemyName: enemy.name), duration: 0.8)
             let result = player.takeDamage(amount: damage)
-            let msg = BattleMessageFormatter.damage(targetName: "旗艦", hpDamage: result.damageToHP, blocked: result.blocked)
+            let msg = BattleMessageFormatter.damage(targetName: enemy.name, hpDamage: result.damageToHP, blocked: result.blocked)
             await showMessage(msg, duration: 1.2)
             
         case .defend(let amount):
@@ -158,7 +157,7 @@ class BattleManager {
         }
         
         if await !checkWinCondition() {
-            displayMessage = "あなたのターン"
+            displayMessage = GameSettings.messages.playerTurnStart
         }
     }
     

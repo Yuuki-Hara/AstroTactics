@@ -31,7 +31,7 @@ struct PlayerStatusView: View {
                     .foregroundColor(.white)
                 Spacer()
                 if player.shield > 0 {
-                    Text("🛡️ シールド: \(player.shield)")
+                    Text("シールド: \(player.shield)")
                         .foregroundColor(.blue)
                         .bold()
                 }
