@@ -4,51 +4,105 @@
 //
 //  Created by 原裕貴 on 2026/03/22.
 //
-
 import Foundation
 
-// ゲーム内に登場するカードを定義するカタログ（マスターデータ）
+// MARK: - JSONを読み込むための仮の型
+struct CardCatalog: Codable {
+    let cards: [CardJSON]
+}
+struct CardJSON: Codable {
+    let baseId: String
+    let name: String
+    let cost: Int
+    let traits: [String]
+    let target: String
+    let effects: [EffectJSON]
+}
+struct EffectJSON: Codable {
+    let type: String
+    let amount: Int?
+    let count: Int?
+}
+
+// MARK: - カード図鑑本体
 struct CardDatabase {
     
-    // ゲーム開始時にプレイヤーが持っている「初期デッキ」を生成して返す
+    // アプリに読み込まれた全カードの設計図を保管する場所
+    static var allCardsData: [Card] = []
+    
+    // 🌟 アプリ起動時にJSONを読み込む関数
+    static func loadFromJSON() {
+        guard let url = Bundle.main.url(forResource: "CardData", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let catalog = try? JSONDecoder().decode(CardCatalog.self, from: data) else {
+            print("⚠️ CardData.json の読み込みに失敗しました！")
+            return
+        }
+        
+        // JSONのデータを、実際のCardオブジェクトに変換（翻訳）して保存する
+        allCardsData = catalog.cards.map { convert(json: $0) }
+        print("✅ カードデータを \(allCardsData.count) 件読み込みました！")
+    }
+    
+    // 🌟 翻訳機：JSONの文字を、Swiftのプログラムに変換する
+    static private func convert(json: CardJSON) -> Card {
+        // 1. 属性（traits）の翻訳
+        let traits = json.traits.compactMap { traitString -> CardTrait? in
+            switch traitString {
+            case "beam": return .beam
+            case "missile": return .missile
+            case "mech": return .mech
+            case "defense": return .defense
+            case "command": return .command
+            default: return nil
+            }
+        }
+        
+        // 2. ターゲットの翻訳
+        let target: TargetType
+        switch json.target {
+        case "allEnemies": target = .allEnemies
+        case "selfTarget": target = .selfTarget
+        default: target = .singleEnemy
+        }
+        
+        // 3. 効果（effects）の翻訳！ここが重要！
+        let effects = json.effects.compactMap { effectJson -> CardEffect? in
+            switch effectJson.type {
+            case "damage": return DealDamageEffect(amount: effectJson.amount ?? 0)
+            case "shield": return GainShieldEffect(amount: effectJson.amount ?? 0)
+            case "draw": return DrawCardEffect(count: effectJson.count ?? 1)
+            case "damageAll": return DealDamageToAllEffect(amount: effectJson.amount ?? 0)
+            case "energy": return GainEnergyEffect(amount: effectJson.amount ?? 0)
+            case "takeDamage": return TakeDamageEffect(amount: effectJson.amount ?? 0)
+            default: return nil
+            }
+        }
+        
+        // 翻訳完了！新しいカードとして返す
+        return Card(baseId: json.baseId, name: json.name, cost: json.cost, traits: traits, target: target, effects: effects)
+    }
+    
+    // MARK: - カードの取得
+    
+    // JSONから読み込んだ初期デッキを返す
     static func startingDeck() -> [Card] {
+        // baseId を指定して、JSONから読み込んだカードをコピーして渡す
+        let strike = allCardsData.first(where: { $0.baseId == "strike" })!
+        let defend = allCardsData.first(where: { $0.baseId == "defend" })!
+        
+        // 通常射撃3枚、基本装甲2枚のデッキ
         return [
-            // 攻撃カード（3枚）
-            Card(baseId: "strike", name: "主砲発射", cost: 1, traits: [.beam], target: .singleEnemy, effects: [DealDamageEffect(amount: 10)]),
-            Card(baseId: "strike", name: "主砲発射", cost: 1, traits: [.beam], target: .singleEnemy, effects: [DealDamageEffect(amount: 10)]),
-            Card(baseId: "strike", name: "主砲発射", cost: 1, traits: [.beam], target: .singleEnemy, effects: [DealDamageEffect(amount: 10)]),
-            
-            // 防御カード（2枚）
-            Card(baseId: "defend", name: "シールド展開", cost: 1, traits: [.defense], target: .selfTarget, effects: [GainShieldEffect(amount: 8)]),
-            Card(baseId: "defend", name: "シールド展開", cost: 1, traits: [.defense], target: .selfTarget, effects: [GainShieldEffect(amount: 8)]),
-            
-            // 回復カード（1枚）：コストは高いがHPが回復する
-            Card(baseId: "repair", name: "緊急ナノ修理", cost: 2, traits: [.mech], target: .selfTarget, effects: [HealEffect(amount: 15)]),
-            
-            // ドローカード（1枚）：コスト0でカードを引ける！
-            Card(baseId: "tactics", name: "戦術分析", cost: 0, traits: [.command], target: .selfTarget, effects: [DrawCardEffect(count: 2)]),
-            
-            // 複合カード（1枚）：ダメージを与えつつ、デバフも与える
-            Card(baseId: "missile", name: "徹甲ミサイル", cost: 2, traits: [.missile], target: .singleEnemy, effects: [
-                DealDamageEffect(amount: 12),
-                ApplyStatusEffect(status: .target, amount: 1)
-            ])
+            Card(baseId: strike.baseId, name: strike.name, cost: strike.cost, traits: strike.traits, target: strike.target, effects: strike.effects),
+            Card(baseId: strike.baseId, name: strike.name, cost: strike.cost, traits: strike.traits, target: strike.target, effects: strike.effects),
+            Card(baseId: strike.baseId, name: strike.name, cost: strike.cost, traits: strike.traits, target: strike.target, effects: strike.effects),
+            Card(baseId: defend.baseId, name: defend.name, cost: defend.cost, traits: defend.traits, target: defend.target, effects: defend.effects),
+            Card(baseId: defend.baseId, name: defend.name, cost: defend.cost, traits: defend.traits, target: defend.target, effects: defend.effects)
         ]
     }
     
+    // 報酬用のカードリスト（初期デッキ以外のカードをランダムに出す）
     static func allRewardCards() -> [Card] {
-            return [
-                Card(baseId: "twin_laser", name: "ツインレーザー", cost: 1, traits: [.beam], target: .singleEnemy, effects: [DealDamageEffect(amount: 6), DealDamageEffect(amount: 6)]),
-                Card(baseId: "heavy_armor", name: "超合金装甲", cost: 2, traits: [.defense], target: .selfTarget, effects: [GainShieldEffect(amount: 15)]),
-                Card(baseId: "emergency_draw", name: "緊急ドロー", cost: 0, traits: [.command], target: .selfTarget, effects: [DrawCardEffect(count: 3)]),
- 
-                Card(baseId: "missile_pod", name: "拡散ミサイル", cost: 2, traits: [.missile], target: .allEnemies, effects: [DealDamageToAllEffect(amount: 8)]),
-
-                Card(baseId: "reactor_boost", name: "リアクター暴走", cost: 0, traits: [.mech], target: .selfTarget, effects: [GainEnergyEffect(amount: 2), TakeDamageEffect(amount: 3)]),
-
-                Card(baseId: "tactical_guard", name: "戦術防壁", cost: 1, traits: [.command, .defense], target: .selfTarget, effects: [GainShieldEffect(amount: 4), DrawCardEffect(count: 1)]),
-
-                Card(baseId: "hyper_cannon", name: "ハイパーカノン", cost: 3, traits: [.beam], target: .singleEnemy, effects: [DealDamageEffect(amount: 25)])
-            ]
-        }
+        return allCardsData.filter { $0.baseId != "strike" && $0.baseId != "defend" }
+    }
 }

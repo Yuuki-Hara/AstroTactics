@@ -21,6 +21,8 @@ class RunManager {
     var currentNodeId: String? = nil
     
     init() {
+        CardDatabase.loadFromJSON()
+        EnemyDatabase.loadFromJSON()
         self.player = PlayerShip(name: "アストロ旗艦", maxHP: 50, maxEnergy: 3)
         self.masterDeck = CardDatabase.startingDeck()
         

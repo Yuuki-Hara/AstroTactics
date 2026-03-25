@@ -4,27 +4,75 @@
 //
 //  Created by 原裕貴 on 2026/03/22.
 //
-
 import Foundation
 
-// ゲーム内に登場する敵を定義する図鑑（マスターデータ）
+// MARK: - JSONを読み込むための型
+struct EnemyCatalog: Codable {
+    let enemies: [EnemyJSON]
+}
+
+struct EnemyJSON: Codable {
+    let category: String
+    let name: String
+    let imageName: String
+    let maxHP: Int
+    let ai: AIJSON // 🌟 AI情報を追加
+}
+
+// 🌟 AIの設計図
+struct AIJSON: Codable {
+    let type: String // "random" か "rotation"
+    let moves: [MoveJSON]
+}
+
+// 🌟 1つ1つの行動の設計図
+struct MoveJSON: Codable {
+    let intent: String
+    let amount: Int? // 固定値（例: 25ダメージ）
+    let min: Int?    // ランダムの最小値
+    let max: Int?    // ランダムの最大値
+}
+
+// MARK: - 敵データベース本体
 struct EnemyDatabase {
     
-    // 図鑑の中からランダムに1体の敵を選んで返す機能
-    static func randomEnemy() -> Enemy {
-        // 色々な個性を持った敵のリストを作成
-        let enemyList = [
-            Enemy(category: "scout", name: "エイリアン偵察機",imageName: "alien_scout" ,maxHP: 30),      // 標準的な敵
-            Enemy(category: "interceptor", name: "高速迎撃ドローン",imageName: "high_speed_drone" , maxHP: 20), // HPは低いが...？
-            Enemy(category: "cruiser", name: "重装甲巡洋艦",imageName: "armored_cruiser" , maxHP: 60),         // HPが高いタフな敵
-        ]
-        
-        // randomElement() は配列の中からランダムに1つを抽出する超便利機能です！
-        // （※ 万が一リストが空だった時のために、?? を使って予備の敵を用意しておきます）
-        return enemyList.randomElement() ?? Enemy(category: "scout", name: "予備の偵察機",imageName: "alien_scout" , maxHP: 30)
+    // JSONから読み込んだ「敵の設計図」を保管する場所
+    static var allEnemiesData: [EnemyJSON] = []
+    
+    // 🌟 アプリ起動時にJSONを読み込む関数
+    static func loadFromJSON() {
+        guard let url = Bundle.main.url(forResource: "EnemyData", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let catalog = try? JSONDecoder().decode(EnemyCatalog.self, from: data) else {
+            print("⚠️ EnemyData.json の読み込みに失敗しました！")
+            return
+        }
+        allEnemiesData = catalog.enemies
+        print("✅ 敵データを \(allEnemiesData.count) 件読み込みました！")
     }
     
-    static func bossFlagShip() -> Enemy {
-        Enemy(category: "flagship", name: "敵主力艦隊",imageName: "main_fleet" , maxHP: 150)
+    // MARK: - 敵の生成
+    
+    // 🌟 雑魚敵をランダムに生成して返す（ボス以外から選ぶ）
+    static func randomEnemy() -> Enemy {
+        let normalEnemies = allEnemiesData.filter { $0.category != "boss" }
+        
+        guard let template = normalEnemies.randomElement() else {
+            // 万が一JSONが空だった場合の保険
+            let dummyAI = AIJSON(type: "random", moves: [MoveJSON(intent: "attack", amount: 1, min: nil, max: nil)])
+            return Enemy(category: "scout", name: "未知の敵", imageName: "questionmark.diamond", maxHP: 10, ai: dummyAI)
+        }
+        
+        return Enemy(category: template.category, name: template.name, imageName: template.imageName, maxHP: template.maxHP, ai: template.ai)
+    }
+    
+    // 🌟 ボスを生成して返す
+    static func bossFlagship() -> Enemy {
+        guard let template = allEnemiesData.first(where: { $0.category == "boss" }) else {
+            let dummyAI = AIJSON(type: "random", moves: [MoveJSON(intent: "attack", amount: 1, min: nil, max: nil)])
+            return Enemy(category: "boss", name: "ボスが見つかりません", imageName: "exclamationmark.triangle", maxHP: 1, ai: dummyAI)
+        }
+        
+        return Enemy(category: template.category, name: template.name, imageName: template.imageName, maxHP: template.maxHP, ai: template.ai)
     }
 }

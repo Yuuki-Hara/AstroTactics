@@ -1,0 +1,57 @@
+{
+  "enemies": [
+    {
+      "category": "scout",
+      "name": "エイリアン・スカウト",
+      "imageName": "alien_scout",
+      "maxHP": 18,
+      "ai": {
+          "type": "random",
+          "moves": [
+              { "intent": "attack", "min": 4, "max": 6 },
+              { "intent": "defend", "min": 3, "max": 5 }
+          ]
+      }
+    },
+    {
+      "category": "fighter",
+      "name": "帝国軍・戦闘機",
+      "imageName": "high_speed_drone",
+      "maxHP": 25,
+      "ai": {
+          "type": "random",
+          "moves": [
+              { "intent": "attack", "min": 6, "max": 9 },
+              { "intent": "defend", "min": 4, "max": 7 }
+          ]
+      }
+    },
+    {
+      "category": "interceptor",
+      "name": "謎の遊撃艦",
+      "imageName": "armored_cruiser",
+      "maxHP": 22,
+      "ai": {
+          "type": "random",
+          "moves": [
+              { "intent": "attack", "min": 8, "max": 10 },
+              { "intent": "defend", "min": 5, "max": 8 }
+          ]
+      }
+    },
+    {
+      "category": "boss",
+      "name": "帝国軍 殲滅旗艦",
+      "imageName": "main_fleet",
+      "maxHP": 150,
+      "ai": {
+          "type": "rotation",
+          "moves": [
+              { "intent": "charge" },
+              { "intent": "attack", "amount": 25 },
+              { "intent": "defend", "amount": 20 }
+          ]
+      }
+    }
+  ]
+}
