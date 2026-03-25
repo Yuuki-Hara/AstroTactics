@@ -13,6 +13,7 @@ enum AppState {
     case map
     case battle
     case reward
+    case rest
     case gameClear
 }
 
@@ -37,17 +38,16 @@ struct ContentView: View {
         // 🗺️ マップ画面
         case .map:
             if let run = runManager {
-                MapView(runManager: run, onEnterNode: { node in
-                    // 選んだマスによって処理を変える
-                    switch node.type {
+                MapView(runManager: run, onNodeSelected: { selectedNode in
+                    // 🌟 1. 選んだマスを「現在の所在地」として記憶する！
+                    run.currentNodeId = selectedNode.id
+                    
+                    // 🌟 2. マスの種類によって、行く画面を切り替える！
+                    switch selectedNode.type {
                     case .battle, .boss:
-                        // ⚔️ バトルマスなら戦闘準備をしてバトル画面へ！
-                        startBattle(run: run)
-                        
+                        startBattle(run: run) // バトル準備をしてバトル画面へ
                     case .rest:
-                        // ☕️ 休憩所ならHPを回復して、そのまま次のマスへ！
-                        run.player.currentHP = min(run.player.maxHP, run.player.currentHP + 20)
-                        run.advanceToNextNode()
+                        appState = .rest      // 休憩所画面へ
                     }
                 })
             }
@@ -83,6 +83,13 @@ struct ContentView: View {
                 runManager = nil
                 appState = .title
             })
+        case .rest:
+            if let run = runManager {
+                RestView(runManager: run, onComplete: {
+                    // 休憩が終わったらマップに戻る
+                    appState = .map
+                })
+            }
         }
     }
     
