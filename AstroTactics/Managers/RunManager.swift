@@ -25,7 +25,6 @@ class RunManager {
         RelicDatabase.loadFromJSON()
         self.player = PlayerShip(name: GameSettings.config.playerShipName, maxHP: GameSettings.config.playerStartingHP, maxEnergy: GameSettings.config.playerStartingEnergy)
         self.masterDeck = CardDatabase.startingDeck()
-        self.relics = RelicDatabase.allRelics
         
         loadMapData()
     }

@@ -25,40 +25,42 @@ struct MapView: View {
     var body: some View {
         ZStack {
             Color(red: 0.1, green: 0.1, blue: 0.2).ignoresSafeArea()
-            
-            ScrollView(showsIndicators: false) {
-                ZStack {
-                    // 🌟 1. マスを描画する前に、マス同士を繋ぐ「線（Path）」を一番奥に描画する！
-                    drawPaths()
-                    
-                    VStack(spacing: 50) {
-                        Text(GameSettings.messages.mapTitle)
-                            .font(.largeTitle).bold()
-                            .foregroundColor(.white)
-                            .padding(.top, 40)
-                            .padding(.bottom, 20)
+            VStack(spacing: 0) {
+                TopStatusBarView(runManager: runManager)
+                ScrollView(showsIndicators: false) {
+                    ZStack {
+                        // 🌟 1. マスを描画する前に、マス同士を繋ぐ「線（Path）」を一番奥に描画する！
+                        drawPaths()
                         
-                        ForEach(Array(runManager.mapFloors.enumerated().reversed()), id: \.offset) { floorIndex, floorNodes in
-                            HStack(spacing: 20) {
-                                ForEach(floorNodes) { node in
-                                    MapNodeView(
-                                        node: node,
-                                        isCurrent: runManager.currentNodeId == node.id,
-                                        canEnter: runManager.canEnter(node: node)
-                                    )
-                                    .onTapGesture {
-                                        if runManager.canEnter(node: node) {
-                                            onNodeSelected(node)
+                        VStack(spacing: 50) {
+                            Text(GameSettings.messages.mapTitle)
+                                .font(.largeTitle).bold()
+                                .foregroundColor(.white)
+                                .padding(.top, 40)
+                                .padding(.bottom, 20)
+                            
+                            ForEach(Array(runManager.mapFloors.enumerated().reversed()), id: \.offset) { floorIndex, floorNodes in
+                                HStack(spacing: 20) {
+                                    ForEach(floorNodes) { node in
+                                        MapNodeView(
+                                            node: node,
+                                            isCurrent: runManager.currentNodeId == node.id,
+                                            canEnter: runManager.canEnter(node: node)
+                                        )
+                                        .onTapGesture {
+                                            if runManager.canEnter(node: node) {
+                                                onNodeSelected(node)
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+                        .padding(.bottom, 80)
                     }
-                    .padding(.bottom, 80)
+                    // 🌟 2. スクロール領域全体を "MapSpace" という名前の座標基準にする
+                    .coordinateSpace(name: "MapSpace")
                 }
-                // 🌟 2. スクロール領域全体を "MapSpace" という名前の座標基準にする
-                .coordinateSpace(name: "MapSpace")
             }
         }
         // 🌟 3. 子（各マス）から座標データが送られてきたら、nodePositionsに保存する
@@ -157,6 +159,7 @@ struct MapNodeView: View {
         case .battle: return "bolt.fill"
         case .rest: return "cup.and.saucer.fill"
         case .boss: return "crown.fill"
+        case .treasure: return "gift.fill"
         }
     }
     
