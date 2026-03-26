@@ -10,10 +10,21 @@ import Foundation
 struct Card: Identifiable {
     let id: UUID = UUID() // 生成時に自動で割り振り
     let baseId: String
-    let name: String
-    let cost: Int
+    var name: String
+    var cost: Int
     let traits: [CardTrait]
     let target: TargetType
     let effects: [CardEffect]
     var isUpgraded: Bool = false
+    
+    mutating func upgrade() {
+        guard !isUpgraded else { return }
+        
+        self.isUpgraded = true
+        self.name = self.name + "+"
+        
+        if self.cost > 0 {
+            self.cost -= 1
+        }
+    }
 }

@@ -5,5 +5,6 @@
     "restHealPercentage": 0.3,
     "battleFieldName": "敵艦隊",
     "restFieldName": "宇宙ステーション",
-    "bossFieldName": "ボス戦艦"
+    "bossFieldName": "ボス戦艦",
+    "treasureFieldName": "宝箱"
 }

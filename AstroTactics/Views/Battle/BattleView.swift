@@ -82,7 +82,9 @@ struct BattleView: View {
     let player = PlayerShip(name: "アストロ旗艦", maxHP: 50, maxEnergy: 3)
     let dummyAI = AIJSON(type: "random", moves: [MoveJSON(intent: "attack", amount: 1, min: nil, max: nil)])
     let enemy = Enemy(category: "alien", name: "エイリアン偵察機",imageName: "alien_scout" , maxHP: 30, ai: dummyAI)
+    let relic = Relic(id: "energy_core", name: "エナジーコア", description: "戦闘開始時、エナジーを1得る。", imageName: "bolt.batteryblock.fill", trigger: RelicTrigger.onBattleStart, effectType: RelicEffectType.gainEnergy, amount: 1)
     let deckManager = BattleDeckManager(startingDeck: CardDatabase.startingDeck())
-    let battleManager = BattleManager(player: player, enemies: [enemy], deckManager: deckManager)
+    let battleManager = BattleManager(player: player, enemies: [enemy], relics: [relic], deckManager: deckManager)
     BattleView(manager: battleManager, onRestart: {})
 }
+

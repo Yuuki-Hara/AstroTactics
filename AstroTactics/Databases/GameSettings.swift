@@ -17,6 +17,7 @@ struct GameConfigJSON: Codable {
     let battleFieldName: String
     let restFieldName: String
     let bossFieldName: String
+    let treasureFieldName: String
 }
 
 struct MessageDataJSON: Codable {

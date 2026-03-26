@@ -1,0 +1,20 @@
+{
+  "relics": [
+    {
+      "id": "energy_core",
+      "name": "エナジーコア",
+      "description": "戦闘開始時、エナジーを1得る。",
+      "imageName": "bolt.batteryblock.fill",
+      "trigger": "onBattleStart",
+      "effect": { "type": "gainEnergy", "amount": 1 }
+    },
+    {
+      "id": "auto_shield",
+      "name": "オートシールド",
+      "description": "毎ターンの開始時、シールドを3得る。",
+      "imageName": "shield.fill",
+      "trigger": "onTurnStart",
+      "effect": { "type": "gainShield", "amount": 3 }
+    }
+  ]
+}

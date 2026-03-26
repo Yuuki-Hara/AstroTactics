@@ -12,6 +12,7 @@ import Observation
 @Observable
 class RunManager {
     var player: PlayerShip
+    var relics: [Relic] = []
     var masterDeck: [Card]
     
     var mapFloors: [[MapNode]] = []
@@ -21,6 +22,7 @@ class RunManager {
         GameSettings.loadAll()
         CardDatabase.loadFromJSON()
         EnemyDatabase.loadFromJSON()
+        RelicDatabase.loadFromJSON()
         self.player = PlayerShip(name: GameSettings.config.playerShipName, maxHP: GameSettings.config.playerStartingHP, maxEnergy: GameSettings.config.playerStartingEnergy)
         self.masterDeck = CardDatabase.startingDeck()
         
