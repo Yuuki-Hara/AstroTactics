@@ -21,7 +21,7 @@ struct CardJSON: Codable {
 struct EffectJSON: Codable {
     let type: String
     let amount: Int?
-    let count: Int?
+    let status: String?
 }
 
 // MARK: - カード図鑑本体
@@ -65,10 +65,17 @@ struct CardDatabase {
             switch effectJson.type {
             case "damage": return DealDamageEffect(amount: effectJson.amount ?? 0)
             case "shield": return GainShieldEffect(amount: effectJson.amount ?? 0)
-            case "draw": return DrawCardEffect(count: effectJson.count ?? 1)
+            case "draw": return DrawCardEffect(count: effectJson.amount ?? 1)
             case "damageAll": return DealDamageToAllEffect(amount: effectJson.amount ?? 0)
             case "energy": return GainEnergyEffect(amount: effectJson.amount ?? 0)
             case "takeDamage": return TakeDamageEffect(amount: effectJson.amount ?? 0)
+            case "randomDamage": return DealRandomDamageEffect(amount: effectJson.amount ?? 0)
+            case "applyStatus":
+                let statusEnum: StatusType = (effectJson.status == "EMP") ? .emp : .target
+                return ApplyStatusEffect(status: statusEnum, amount: effectJson.amount ?? 0)
+                
+            case "gainStrength":
+                return GainStrengthEffect(amount: effectJson.amount ?? 0)
             default: return nil
             }
         }

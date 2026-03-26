@@ -81,6 +81,8 @@ class BattleManager {
     
     @MainActor private func handleBattleStart() async {
         deckManager.drawCard(count: 5)
+        player.resetEnergy()
+        player.statuses = [:]
         for enemy in enemies { enemy.determineNextIntent() }
         await triggerRelics(on: .onBattleStart)
         await wait(seconds: 1.0)
@@ -89,7 +91,9 @@ class BattleManager {
     
     @MainActor private func handlePlayerTurnStart() async {
         turnCount += 1
-        player.resetEnergy()
+        if turnCount != 1 {
+            player.resetEnergy()
+        }
         player.shield = 0
         await triggerRelics(on: .onTurnStart)
         await showMessage(GameSettings.messages.playerTurnStart, duration: 0.8)

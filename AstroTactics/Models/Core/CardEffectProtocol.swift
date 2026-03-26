@@ -22,7 +22,11 @@ struct DealDamageEffect: CardEffect {
     @MainActor
     func execute(manager: BattleManager, target: Enemy?) async {
         if let target = target {
-            let result = target.takeDamage(amount: amount)
+            var totalDamage = amount
+            if manager.player.statuses[.strength, default: 0] > 0 {
+                totalDamage = Int(Double(totalDamage) * 1.5)
+            }
+            let result = target.takeDamage(amount: totalDamage)
             let msg = BattleMessageFormatter.damage(targetName: target.name, hpDamage: result.damageToHP, blocked: result.blocked)
             await manager.showMessage(msg, duration: 1.2)
         }
@@ -96,7 +100,11 @@ struct DealDamageToAllEffect: CardEffect {
     func execute(manager: BattleManager, target: Enemy?) async {
         await manager.showMessage(BattleMessageFormatter.damageToAll())
         for enemy in manager.enemies where enemy.currentHP > 0 {
-            let result = enemy.takeDamage(amount: amount)
+            var totalDamage = amount
+            if manager.player.statuses[.strength, default: 0] > 0 {
+                totalDamage = Int(Double(totalDamage) * 1.5)
+            }
+            let result = enemy.takeDamage(amount: totalDamage)
             let msg = BattleMessageFormatter.damage(targetName: enemy.name, hpDamage: result.damageToHP, blocked: result.blocked)
             await manager.showMessage(msg)
         }
@@ -111,5 +119,39 @@ struct TakeDamageEffect: CardEffect {
     func execute(manager: BattleManager, target: Enemy?) async {
         manager.player.takeDamage(amount: amount)
         await manager.showMessage(BattleMessageFormatter.takeDamage(amount: amount))
+    }
+}
+
+struct DealRandomDamageEffect: CardEffect {
+    let amount: Int
+    var description: String { "ランダムな敵に \(amount) ダメージ" }
+    
+    @MainActor
+    func execute(manager: BattleManager, target: Enemy?) async {
+        // 1. 生きている敵だけをリストアップする
+        let aliveEnemies = manager.enemies.filter { $0.currentHP > 0 }
+        
+        // 2. その中からランダムに1体選ぶ
+        if let randomTarget = aliveEnemies.randomElement() {
+            // 3. 選ばれた敵にダメージを与える！
+            var totalDamage = amount
+            if manager.player.statuses[.strength, default: 0] > 0 {
+                totalDamage = Int(Double(totalDamage) * 1.5)
+            }
+            let result = randomTarget.takeDamage(amount: totalDamage)
+            let msg = BattleMessageFormatter.damage(targetName: randomTarget.name, hpDamage: result.damageToHP, blocked: result.blocked)
+            await manager.showMessage(msg, duration: 1.2)
+        }
+    }
+}
+
+struct GainStrengthEffect: CardEffect {
+    let amount: Int
+    var description: String { "攻撃力が \(amount) ターン上昇" }
+    
+    @MainActor
+    func execute(manager: BattleManager, target: Enemy?) async {
+        manager.player.statuses[.strength, default: 0] += amount        // 独自のメッセージフォーマッターがあれば、それに合わせてください！
+        await manager.showMessage("💪 攻撃力システム・ブースト！(+\(amount))")
     }
 }

@@ -16,10 +16,12 @@ class PlayerShip: CombatEntity {
     var maxHP: Int
     var currentHP: Int
     var shield: Int = 0
+    var strength: Int = 0
     var statuses: [StatusType: Int] = [:]
     
     var maxEnergy: Int
     var currentEnergy: Int
+    
     
     init(name: String, maxHP: Int, maxEnergy: Int) {
         self.name = name

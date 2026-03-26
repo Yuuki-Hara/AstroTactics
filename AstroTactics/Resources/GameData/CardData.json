@@ -16,29 +16,22 @@
       "target": "selfTarget",
       "effects": [{ "type": "shield", "amount": 6 }]
     },
+
     {
-      "baseId": "twin_laser",
-      "name": "ツインレーザー",
+      "baseId": "emp_grenade",
+      "name": "EMPグレネード",
       "cost": 1,
-      "traits": ["beam"],
-      "target": "singleEnemy",
-      "effects": [{ "type": "damage", "amount": 4 }, { "type": "damage", "amount": 4 }]
-    },
-    {
-      "baseId": "missile_pod",
-      "name": "拡散ミサイル",
-      "cost": 2,
       "traits": ["missile"],
-      "target": "allEnemies",
-      "effects": [{ "type": "damageAll", "amount": 8 }]
+      "target": "singleEnemy",
+      "effects": [{ "type": "applyStatus", "status": "EMP", "amount": 2 }]
     },
     {
-      "baseId": "reactor_boost",
-      "name": "リアクター暴走",
-      "cost": 0,
+      "baseId": "limiter_release",
+      "name": "リミッター解除",
+      "cost": 1,
       "traits": ["mech"],
       "target": "selfTarget",
-      "effects": [{ "type": "energy", "amount": 2 }, { "type": "takeDamage", "amount": 3 }]
+      "effects": [{ "type": "gainStrength", "amount": 3 }]
     }
   ]
 }

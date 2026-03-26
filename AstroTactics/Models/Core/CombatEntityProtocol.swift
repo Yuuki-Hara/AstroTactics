@@ -26,9 +26,7 @@ extension CombatEntity {
     func takeDamage(amount: Int) -> (damageToHP: Int, blocked: Int) {
         var finalDamage = amount
         
-        // 🌟 追加：ターゲット(被ダメ増)の効果を計算！
-        if statuses[.target, default: 0] > 0 {
-            finalDamage = Int(Double(finalDamage) * 1.5) // ダメージ1.5倍！
+        if statuses[.target, default: 0] > 0 || statuses[.emp, default: 0] > 0 {            finalDamage = Int(Double(finalDamage) * 1.5) // ダメージ1.5倍！
             print("🎯 ターゲット効果でダメージ増大！(\(amount) -> \(finalDamage))")
         }
         
