@@ -7,6 +7,14 @@
 
 import Foundation
 
+enum CardTrait {
+    case beam, missile, mech, defense, command
+}
+
+enum TargetType {
+    case singleEnemy, allEnemies, randomEnemy, selfTarget
+}
+
 struct Card: Identifiable {
     let id: UUID = UUID() // 生成時に自動で割り振り
     let baseId: String

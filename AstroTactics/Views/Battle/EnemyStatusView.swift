@@ -51,13 +51,14 @@ struct EnemyStatusView: View {
                 .minimumScaleFactor(0.5)
             
             // MARK: - 4. 状態異常とシールド
-            if enemy.statuses[.target, default: 0] > 0 {
-                Text("ターゲット残り \(enemy.statuses[.target]!)")
-                    .font(.caption2).bold()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .foregroundColor(.orange)
-            }
+//            if enemy.statuses[.target, default: 0] > 0 {
+//                Text("ターゲット残り \(enemy.statuses[.target]!)")
+//                    .font(.caption2).bold()
+//                    .lineLimit(1)
+//                    .minimumScaleFactor(0.5)
+//                    .foregroundColor(.orange)
+//            }
+            StatusEffectRowView(statuses: enemy.statuses)
 
             if enemy.shield > 0 {
                 Text("シールド: \(enemy.shield)")

@@ -5,16 +5,8 @@
 //  Created by 原裕貴 on 2026/03/21.
 //
 
-enum CardTrait {
-    case beam, missile, mech, defense, command
-}
-
-enum TargetType {
-    case singleEnemy, allEnemies, randomEnemy, selfTarget
-}
-
 enum StatusType {
-    case emp, target, evasion
+    case emp, target, strength
 }
 
 enum EnemyIntent {

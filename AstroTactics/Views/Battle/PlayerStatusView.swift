@@ -30,6 +30,7 @@ struct PlayerStatusView: View {
                 Text("HP: \(player.currentHP) / \(player.maxHP)")
                     .foregroundColor(.white)
                 Spacer()
+                StatusEffectRowView(statuses: player.statuses)
                 if player.shield > 0 {
                     Text("シールド: \(player.shield)")
                         .foregroundColor(.blue)
