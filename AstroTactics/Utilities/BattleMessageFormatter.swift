@@ -63,4 +63,13 @@ struct BattleMessageFormatter {
     static func enemyCharge(enemyName: String) -> String {
         return "\(enemyName) はエネルギーを充填している…！"
     }
+    
+    static func gainEnergyByRelic(name: String, amount: Int) -> String {
+        return "[\(name)] エナジー+\(amount)"
+    }
+    
+    static func gainShieldByRelic(name: String, amount: Int) -> String {
+        return "[\(name)] シールド+\(amount)"
+    }
+    
 }

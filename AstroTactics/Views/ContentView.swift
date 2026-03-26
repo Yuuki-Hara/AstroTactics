@@ -107,7 +107,7 @@ struct ContentView: View {
         }
 
         let freshDeckManager = BattleDeckManager(startingDeck: run.masterDeck)
-        battleManager = BattleManager(player: run.player, enemies: enemiesToFight, deckManager: freshDeckManager)
+        battleManager = BattleManager(player: run.player, enemies: enemiesToFight, relics: run.relics, deckManager: freshDeckManager)
         
         appState = .battle
     }

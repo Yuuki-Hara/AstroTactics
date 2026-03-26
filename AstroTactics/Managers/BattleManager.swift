@@ -14,14 +14,16 @@ class BattleManager {
     var displayMessage: String = ""
     var player: PlayerShip
     var enemies: [Enemy]
+    var relics: [Relic] = []
     var deckManager: BattleDeckManager
     var turnCount: Int = 0
     var animationSpeed: Double = 1.0
     
-    init(player: PlayerShip, enemies: [Enemy], deckManager: BattleDeckManager) {
+    init(player: PlayerShip, enemies: [Enemy], relics: [Relic], deckManager: BattleDeckManager) {
         self.player = player
         self.enemies = enemies
         self.deckManager = deckManager
+        self.relics = relics
     }
     
     private func wait(seconds: Double) async {
@@ -61,9 +63,26 @@ class BattleManager {
         }
     }
     
+    // 🌟 追加：指定したタイミングでレリックの効果を発動する機能
+    private func triggerRelics(on trigger: RelicTrigger) async {
+        for relic in relics where relic.trigger == trigger {
+            switch relic.effectType {
+            case .gainEnergy:
+                player.currentEnergy += relic.amount
+                print("💎 レリック発動！[\(relic.name)] エナジーを\(relic.amount)回復！")
+                await showMessage(BattleMessageFormatter.gainEnergyByRelic(name: relic.name, amount: relic.amount), duration: 1.2)
+            case .gainShield:
+                player.shield += relic.amount
+                print("💎 レリック発動！[\(relic.name)] シールドを\(relic.amount)獲得！")
+                await showMessage(BattleMessageFormatter.gainShieldByRelic(name: relic.name, amount: relic.amount), duration: 1.2)
+            }
+        }
+    }
+    
     @MainActor private func handleBattleStart() async {
         deckManager.drawCard(count: 5)
         for enemy in enemies { enemy.determineNextIntent() }
+        await triggerRelics(on: .onBattleStart)
         await wait(seconds: 1.0)
         await changeState(to: .playerTurnStart)
     }
@@ -72,6 +91,7 @@ class BattleManager {
         turnCount += 1
         player.resetEnergy()
         player.shield = 0
+        await triggerRelics(on: .onTurnStart)
         await showMessage(GameSettings.messages.playerTurnStart, duration: 0.8)
         await changeState(to: .playerAction)
     }
