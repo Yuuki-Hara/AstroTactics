@@ -19,58 +19,86 @@ struct MapView: View {
     var runManager: RunManager
     var onNodeSelected: (MapNode) -> Void
     
-    // 🌟 全マスの「画面上の座標」を記憶しておく辞書
     @State private var nodePositions: [String: CGPoint] = [:]
+    
+    // 🌟 追加：現在地が含まれるフロア（floorIndex）を計算するヘルパー
+    private var currentFloorIndex: Int? {
+        // 全階層（runManager.mapFloors）をループして、現在地のIDが含まれる配列を探す
+        return runManager.mapFloors.firstIndex { floorNodes in
+            floorNodes.contains { node in
+                node.id == runManager.currentNodeId
+            }
+        }
+    }
     
     var body: some View {
         ZStack {
             Color(red: 0.1, green: 0.1, blue: 0.2).ignoresSafeArea()
+            
+            // 🌟 修正1：全体を VStack で囲んで、一番上にステータスバーを置く（画像_14_30114.png のレイアウト）
             VStack(spacing: 0) {
+                
                 TopStatusBarView(runManager: runManager)
-                ScrollView(showsIndicators: false) {
-                    ZStack {
-                        // 🌟 1. マスを描画する前に、マス同士を繋ぐ「線（Path）」を一番奥に描画する！
-                        drawPaths()
-                        
-                        VStack(spacing: 50) {
-                            Text(GameSettings.messages.mapTitle)
-                                .font(.largeTitle).bold()
-                                .foregroundColor(.white)
-                                .padding(.top, 40)
-                                .padding(.bottom, 20)
+                
+                // 🌟 修正2：ScrollViewReader でScrollViewを囲む
+                ScrollViewReader { proxy in
+                    ScrollView(showsIndicators: false) {
+                        ZStack {
+                            drawPaths()
                             
-                            ForEach(Array(runManager.mapFloors.enumerated().reversed()), id: \.offset) { floorIndex, floorNodes in
-                                HStack(spacing: 20) {
-                                    ForEach(floorNodes) { node in
-                                        MapNodeView(
-                                            node: node,
-                                            isCurrent: runManager.currentNodeId == node.id,
-                                            canEnter: runManager.canEnter(node: node)
-                                        )
-                                        .onTapGesture {
-                                            if runManager.canEnter(node: node) {
-                                                onNodeSelected(node)
+                            VStack(spacing: 50) {
+                                Text(GameSettings.messages.mapTitle)
+                                    .font(.largeTitle).bold()
+                                    .foregroundColor(.white)
+                                    .padding(.top, 40)
+                                    .padding(.bottom, 20)
+                                
+                                // 階層の並び順はそのまま（ボスが上）
+                                ForEach(Array(runManager.mapFloors.enumerated().reversed()), id: \.offset) { floorIndex, floorNodes in
+                                    HStack(spacing: 20) {
+                                        ForEach(floorNodes) { node in
+                                            MapNodeView(
+                                                node: node,
+                                                isCurrent: runManager.currentNodeId == node.id,
+                                                canEnter: runManager.canEnter(node: node)
+                                            )
+                                            .onTapGesture {
+                                                if runManager.canEnter(node: node) {
+                                                    onNodeSelected(node)
+                                                }
                                             }
                                         }
                                     }
+                                    // 🌟 修正3：各階層（HStack）に .id(floorIndex) を付与して、スクロールの目印にする！
+                                    .id(floorIndex)
+                                }
+                            }
+                            .padding(.bottom, 80)
+                        }
+                        .coordinateSpace(name: "MapSpace")
+                    }
+                    // 🌟 修正4：マップ画面が開いた瞬間（.onAppear）に、現在地のフロアまで自動スクロールする！
+                    .onAppear {
+                        // 以前のエラー（Thread 1: Fatal error...）を回避するため、
+                        // ゲームの設定が読み込まれているか確認してからスクロール
+                        if let _ = GameSettings.config, let floorIndex = currentFloorIndex {
+                            // 少しだけ遅らせる（wait）と、スクロールアニメーションがより綺麗に見えます
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                withAnimation(.easeOut(duration: 0.8)) {
+                                    // 指定した floorIndex の場所までスクロール！ anchor: .center で画面中央に配置
+                                    proxy.scrollTo(floorIndex, anchor: .center)
                                 }
                             }
                         }
-                        .padding(.bottom, 80)
                     }
-                    // 🌟 2. スクロール領域全体を "MapSpace" という名前の座標基準にする
-                    .coordinateSpace(name: "MapSpace")
                 }
             }
         }
-        // 🌟 3. 子（各マス）から座標データが送られてきたら、nodePositionsに保存する
         .onPreferenceChange(NodePositionKey.self) { positions in
             self.nodePositions = positions
         }
     }
     
-    // MARK: - 線を引く処理
-    // MARK: - 線を引く処理
     @ViewBuilder
     private func drawPaths() -> some View {
         let allNodes = runManager.mapFloors.flatMap { $0 }

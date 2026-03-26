@@ -3,12 +3,47 @@
     [
       { "id": "floor1_A", "type": "battle", "nextNodeIds": ["floor2_A", "floor2_B"] },
       { "id": "floor1_B", "type": "battle", "nextNodeIds": ["floor2_B", "floor2_C"] },
-      { "id": "floor1_C", "type": "treasure", "nextNodeIds": ["floor2_C"]}
+      { "id": "floor1_C", "type": "battle", "nextNodeIds": ["floor2_C"] }
     ],
     [
-      { "id": "floor2_A", "type": "rest", "nextNodeIds": ["boss_1"] },
-      { "id": "floor2_B", "type": "battle", "nextNodeIds": ["boss_1"] },
-      { "id": "floor2_C", "type": "rest", "nextNodeIds": ["boss_1"] }
+      { "id": "floor2_A", "type": "battle", "nextNodeIds": ["floor3_Treasure", "floor3_Rest"] },
+      { "id": "floor2_B", "type": "battle", "nextNodeIds": ["floor3_Rest", "floor3_Battle"] },
+      { "id": "floor2_C", "type": "battle", "nextNodeIds": ["floor3_Battle"] }
+    ],
+    [
+      { "id": "floor3_Treasure", "type": "treasure", "nextNodeIds": ["floor4_A", "floor4_B"] },
+      { "id": "floor3_Rest", "type": "rest", "nextNodeIds": ["floor4_B", "floor4_C"] },
+      { "id": "floor3_Battle", "type": "battle", "nextNodeIds": ["floor4_C"] }
+    ],
+    [
+      { "id": "floor4_A", "type": "battle", "nextNodeIds": ["floor5_Elite", "floor5_TreasureA"] },
+      { "id": "floor4_B", "type": "battle", "nextNodeIds": ["floor5_Elite", "floor5_TreasureA", "floor5_TreasureB"] },
+      { "id": "floor4_C", "type": "battle", "nextNodeIds": ["floor5_TreasureA", "floor5_TreasureB"] }
+    ],
+    [
+      { "id": "floor5_Elite", "type": "battle", "nextNodeIds": ["floor6_A", "floor6_B"] },
+      { "id": "floor5_TreasureA", "type": "treasure", "nextNodeIds": ["floor6_B", "floor6_C"] },
+      { "id": "floor5_TreasureB", "type": "treasure", "nextNodeIds": ["floor6_C"] }
+    ],
+    [
+      { "id": "floor6_A", "type": "battle", "nextNodeIds": ["floor7_Rest", "floor7_BattleA"] },
+      { "id": "floor6_B", "type": "battle", "nextNodeIds": ["floor7_BattleA", "floor7_BattleB"] },
+      { "id": "floor6_C", "type": "battle", "nextNodeIds": ["floor7_BattleB"] }
+    ],
+    [
+      { "id": "floor7_Rest", "type": "rest", "nextNodeIds": ["floor8_A", "floor8_B"] },
+      { "id": "floor7_BattleA", "type": "battle", "nextNodeIds": ["floor8_B", "floor8_C"] },
+      { "id": "floor7_BattleB", "type": "battle", "nextNodeIds": ["floor8_C"] }
+    ],
+    [
+      { "id": "floor8_A", "type": "battle", "nextNodeIds": ["floor9_Rest", "floor9_Treasure"] },
+      { "id": "floor8_B", "type": "battle", "nextNodeIds": ["floor9_Treasure", "floor9_Battle"] },
+      { "id": "floor8_C", "type": "battle", "nextNodeIds": ["floor9_Battle"] }
+    ],
+    [
+      { "id": "floor9_Rest", "type": "rest", "nextNodeIds": ["boss_1"] },
+      { "id": "floor9_Treasure", "type": "treasure", "nextNodeIds": ["boss_1"] },
+      { "id": "floor9_Battle", "type": "battle", "nextNodeIds": ["boss_1"] }
     ],
     [
       { "id": "boss_1", "type": "boss", "nextNodeIds": [] }
