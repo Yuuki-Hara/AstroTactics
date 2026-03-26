@@ -16,7 +16,22 @@
       "target": "selfTarget",
       "effects": [{ "type": "shield", "amount": 6 }]
     },
-
+    {
+      "baseId": "twin_laser",
+      "name": "ツインレーザー",
+      "cost": 1,
+      "traits": ["beam"],
+      "target": "allEnemies",
+      "effects": [{ "type": "randomDamage", "amount": 4 }, { "type": "randomDamage", "amount": 4 }]
+    },
+    {
+      "baseId": "gatling_gun",
+      "name": "ガトリング砲",
+      "cost": 2,
+      "traits": ["missile"],
+      "target": "allEnemies",
+      "effects": [{ "type": "randomDamage", "amount": 3 }, { "type": "randomDamage", "amount": 3 }, { "type": "randomDamage", "amount": 3 }, { "type": "randomDamage", "amount": 3 }]
+    },
     {
       "baseId": "emp_grenade",
       "name": "EMPグレネード",
@@ -32,6 +47,102 @@
       "traits": ["mech"],
       "target": "selfTarget",
       "effects": [{ "type": "gainStrength", "amount": 3 }]
+    },
+    {
+      "baseId": "tactical_draw",
+      "name": "戦術分析",
+      "cost": 1,
+      "traits": ["mech"],
+      "target": "selfTarget",
+      "effects": [{ "type": "draw", "amount": 2 }]
+    },
+    {
+      "baseId": "emergency_reload",
+      "name": "緊急リロード",
+      "cost": 0,
+      "traits": ["mech"],
+      "target": "selfTarget",
+      "effects": [{ "type": "takeDamage", "amount": 2 }, { "type": "draw", "amount": 3 }]
+    },
+    {
+      "baseId": "missile_pod",
+      "name": "拡散ミサイル",
+      "cost": 2,
+      "traits": ["missile"],
+      "target": "allEnemies",
+      "effects": [{ "type": "damageAll", "amount": 8 }]
+    },
+    {
+      "baseId": "reactor_boost",
+      "name": "リアクター暴走",
+      "cost": 0,
+      "traits": ["mech"],
+      "target": "selfTarget",
+      "effects": [{ "type": "energy", "amount": 2 }, { "type": "takeDamage", "amount": 3 }]
+    },
+    {
+      "baseId": "heavy_cannon",
+      "name": "ヘビーキャノン",
+      "cost": 2,
+      "traits": ["beam"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "damage", "amount": 18 }]
+    },
+    {
+      "baseId": "quick_shot",
+      "name": "クイックショット",
+      "cost": 0,
+      "traits": ["beam"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "damage", "amount": 5 }]
+    },
+    {
+      "baseId": "fortress_shield",
+      "name": "フォートレス展開",
+      "cost": 2,
+      "traits": ["defense"],
+      "target": "selfTarget",
+      "effects": [{ "type": "shield", "amount": 15 }]
+    },
+    {
+      "baseId": "assault_tackle",
+      "name": "突撃装甲",
+      "cost": 1,
+      "traits": ["mech", "defense"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "damage", "amount": 7 }, { "type": "shield", "amount": 5 }]
+    },
+    {
+      "baseId": "overcharge",
+      "name": "オーバーチャージ",
+      "cost": 1,
+      "traits": ["mech"],
+      "target": "selfTarget",
+      "effects": [{ "type": "takeDamage", "amount": 5 }, { "type": "energy", "amount": 3 }]
+    },
+    {
+      "baseId": "conversion_shield",
+      "name": "変換シールド",
+      "cost": 0,
+      "traits": ["defense"],
+      "target": "selfTarget",
+      "effects": [{ "type": "takeDamage", "amount": 2 }, { "type": "shield", "amount": 8 }]
+    },
+    {
+      "baseId": "sniper_beam",
+      "name": "狙撃レーザー",
+      "cost": 1,
+      "traits": ["beam"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "damage", "amount": 12 }]
+    },
+    {
+      "baseId": "reckless_charge",
+      "name": "捨て身の突撃",
+      "cost": 1,
+      "traits": ["mech"],
+      "target": "singleEnemy",
+      "effects": [{ "type": "takeDamage", "amount": 3 }, { "type": "damage", "amount": 14 }]
     }
   ]
 }
