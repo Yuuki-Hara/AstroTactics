@@ -5,8 +5,10 @@
 //  Created by 原裕貴 on 2026/03/21.
 //
 
-// 共通仕様（プロトコル）
-// AnyObjectを継承することで、これを採用する型がクラス（参照型）であることを保証します
+enum StatusType {
+    case emp, target, strength
+}
+
 protocol CombatEntity: AnyObject {
     var name: String { get }
     var maxHP: Int { get }

@@ -9,6 +9,18 @@ import Foundation
 import Observation
 import Combine
 
+enum BattleState {
+    case battleStart
+    case playerTurnStart
+    case playerAction
+    case playerTurnEnd
+    case enemyTurnStart
+    case enemyAction
+    case enemyTurnEnd
+    case victory
+    case defeat
+}
+
 @Observable
 class BattleManager {
     var currentState: BattleState = .battleStart

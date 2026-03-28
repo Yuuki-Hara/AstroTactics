@@ -7,7 +7,14 @@
 import Foundation
 import Observation
 
-// 敵（クラス）
+enum EnemyIntent {
+    case attack(damage: Int)
+    case defend(amount: Int)
+    case charge
+    case buff
+    case debuff(status: StatusType)
+}
+
 @Observable
 class Enemy: CombatEntity, Identifiable {
     let id = UUID()
