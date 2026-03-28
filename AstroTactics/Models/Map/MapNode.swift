@@ -14,6 +14,7 @@ enum NodeType: String, Codable {
     case rest    // 休憩所（回復）
     case boss    // ボス戦
     case treasure
+    case shop
     
     // 画面に表示する時のアイコンと名前
     var title: String {
@@ -22,6 +23,7 @@ enum NodeType: String, Codable {
         case .rest: return GameSettings.config.restFieldName
         case .boss: return GameSettings.config.bossFieldName
         case .treasure: return GameSettings.config.treasureFieldName
+        case .shop: return GameSettings.config.shopFieldName
         }
     }
 }

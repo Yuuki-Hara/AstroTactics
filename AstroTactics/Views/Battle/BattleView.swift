@@ -59,13 +59,14 @@ struct BattleView: View {
                         await manager.endPlayerTurn()
                     }
                 },
-                    isDisabled: manager.currentState != .playerAction
+                    isDisabled: manager.currentState != .playerAction || manager.isProcessing
                 )
                 HandView(manager: manager, targetId: $targetId)
+                    .allowsHitTesting(!manager.isProcessing)
 
             }
             if manager.currentState == .victory || manager.currentState == .defeat {
-                RestartView(isVictory: manager.currentState == .victory, onRestart: onRestart)
+                RestartView(isVictory: manager.currentState == .victory, earnedCredits: manager.earnedCredits, onRestart: onRestart)
             }
         }
         // 🌟 ここは .onAppear ではなく .task を使います

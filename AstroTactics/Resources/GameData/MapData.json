@@ -13,7 +13,7 @@
     [
       { "id": "floor3_Treasure", "type": "treasure", "nextNodeIds": ["floor4_A", "floor4_B"] },
       { "id": "floor3_Rest", "type": "rest", "nextNodeIds": ["floor4_B", "floor4_C"] },
-      { "id": "floor3_Battle", "type": "battle", "nextNodeIds": ["floor4_C"] }
+      { "id": "floor3_Battle", "type": "shop", "nextNodeIds": ["floor4_C"] }
     ],
     [
       { "id": "floor4_A", "type": "battle", "nextNodeIds": ["floor5_Elite", "floor5_TreasureA"] },

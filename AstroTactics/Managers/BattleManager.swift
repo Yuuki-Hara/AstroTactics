@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import Combine
 
 @Observable
 class BattleManager {
@@ -18,6 +19,10 @@ class BattleManager {
     var deckManager: BattleDeckManager
     var turnCount: Int = 0
     var animationSpeed: Double = 1.0
+    
+    var earnedCredits: Int = 0
+    
+    var isProcessing: Bool = false
     
     init(player: PlayerShip, enemies: [Enemy], relics: [Relic], deckManager: BattleDeckManager) {
         self.player = player
@@ -75,6 +80,15 @@ class BattleManager {
                 player.shield += relic.amount
                 print("💎 レリック発動！[\(relic.name)] シールドを\(relic.amount)獲得！")
                 await showMessage(BattleMessageFormatter.gainShieldByRelic(name: relic.name, amount: relic.amount), duration: 1.2)
+            // 💖 追加：HP回復
+            case .heal:
+                player.currentHP = min(player.maxHP, player.currentHP + relic.amount)
+                await showMessage("🔧 レリック発動！[\(relic.name)] HPを\(relic.amount)回復！", duration: 1.2)
+                
+            // 💪 追加：筋力アップ
+            case .gainStrength:
+                player.statuses[.strength, default: 0] += relic.amount
+                await showMessage("🔥 レリック発動！[\(relic.name)] 筋力+\(relic.amount)！", duration: 1.2)
             }
         }
     }
@@ -162,13 +176,16 @@ class BattleManager {
     
     @MainActor
     func endPlayerTurn() async {
-        guard currentState == .playerAction else { return }
+        guard currentState == .playerAction, !isProcessing else { return }
+        
+        isProcessing = true
+        defer { isProcessing = false }
         await changeState(to: .playerTurnEnd)
     }
     
     @MainActor
     func useCard(_ card: Card, target: Enemy?) async {
-        guard currentState == .playerAction else { return }
+        guard currentState == .playerAction, !isProcessing else { return }
         guard player.currentEnergy >= card.cost else { return }
         
         player.currentEnergy -= card.cost
@@ -191,6 +208,10 @@ class BattleManager {
     
     @MainActor
     private func checkWinCondition() async -> Bool {
+        if currentState == .victory || currentState == .defeat {
+            return true
+        }
+        
         if player.currentHP <= 0 {
             await changeState(to: .defeat)
             return true
@@ -198,6 +219,8 @@ class BattleManager {
         
         let allEnemiesDefeated = enemies.allSatisfy { $0.currentHP <= 0 }
         if allEnemiesDefeated {
+            self.earnedCredits = Int.random(in: 10...25)
+            player.credits += self.earnedCredits
             await changeState(to: .victory)
             return true
         }

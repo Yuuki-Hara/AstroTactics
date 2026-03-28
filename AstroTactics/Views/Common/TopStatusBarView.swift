@@ -30,6 +30,14 @@ struct TopStatusBarView: View {
                     .font(.headline).bold()
                     .foregroundColor(.white)
             }
+            // 🌟 TopStatusBarView.swift の HStack の中（エナジーの隣など）に追加
+            HStack(spacing: 4) {
+                Image(systemName: "dollarsign.circle.fill")
+                    .foregroundColor(.yellow)
+                Text("\(runManager.player.credits)") // 💰 所持金を表示！
+                    .font(.headline).bold()
+                    .foregroundColor(.white)
+            }
             
             Spacer()
             

@@ -80,13 +80,14 @@ struct MapView: View {
                     // 🌟 修正4：マップ画面が開いた瞬間（.onAppear）に、現在地のフロアまで自動スクロールする！
                     .onAppear {
                         // 以前のエラー（Thread 1: Fatal error...）を回避するため、
+                        let targetFloorIndex = currentFloorIndex ?? 0
                         // ゲームの設定が読み込まれているか確認してからスクロール
-                        if let _ = GameSettings.config, let floorIndex = currentFloorIndex {
+                        if let _ = GameSettings.config {
                             // 少しだけ遅らせる（wait）と、スクロールアニメーションがより綺麗に見えます
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 withAnimation(.easeOut(duration: 0.8)) {
                                     // 指定した floorIndex の場所までスクロール！ anchor: .center で画面中央に配置
-                                    proxy.scrollTo(floorIndex, anchor: .center)
+                                    proxy.scrollTo(targetFloorIndex, anchor: .center)
                                 }
                             }
                         }
@@ -188,6 +189,7 @@ struct MapNodeView: View {
         case .rest: return "cup.and.saucer.fill"
         case .boss: return "crown.fill"
         case .treasure: return "gift.fill"
+        case .shop: return "cart.fill"
         }
     }
     
