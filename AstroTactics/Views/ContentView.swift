@@ -16,6 +16,7 @@ enum AppState {
     case rest
     case gameClear
     case treasure
+    case shop
 }
 
 struct ContentView: View {
@@ -51,6 +52,8 @@ struct ContentView: View {
                         appState = .rest      // 休憩所画面へ
                     case .treasure:
                         appState = .treasure
+                    case .shop:
+                        appState = .shop
                     }
                 })
             }
@@ -96,6 +99,13 @@ struct ContentView: View {
         case .treasure:
             if let run = runManager {
                 TreasureView(runManager: run, onComplete: {
+                    // 休憩が終わったらマップに戻る
+                    appState = .map
+                })
+            }
+        case .shop:
+            if let run = runManager {
+                ShopView(runManager: run, onComplete: {
                     // 休憩が終わったらマップに戻る
                     appState = .map
                 })

@@ -4,7 +4,6 @@
 //
 //  Created by 原裕貴 on 2026/03/23.
 //
-
 import SwiftUI
 
 struct HandView: View {
@@ -18,6 +17,9 @@ struct HandView: View {
             HStack(spacing: 15) {
                 ForEach(manager.deckManager.hand) { card in
                     Button(action: {
+                        // 🔒 鉄壁の守り1：処理中、または自分のターンでないなら、連打されても完全に無視する！
+                        guard !manager.isProcessing, manager.currentState == .playerAction else { return }
+                        
                         if card.target == .singleEnemy {
                             // 🌟 単体攻撃なら、ロックオンしている敵に向かって即使う！
                             let targetEnemy = manager.enemies.first(where: { $0.id == targetId && $0.currentHP > 0 })
@@ -34,10 +36,13 @@ struct HandView: View {
                         }
                     }) {
                         CardView(card: card)
-                            // ※カードが上に浮くアニメーションは不要になったので削除しました
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .disabled(manager.player.currentEnergy < card.cost)
+                    
+                    // 🔒 鉄壁の守り2：「エナジー不足」だけでなく「処理中」の時もボタンを無効化（タップ不可）にする！
+                    .disabled(manager.player.currentEnergy < card.cost || manager.isProcessing)
+                    
+                    // 見た目はエナジー不足の時だけ暗くする（処理中は明るいまま待機させる）
                     .opacity(manager.player.currentEnergy < card.cost ? 0.5 : 1.0)
                 }
             }
@@ -45,5 +50,7 @@ struct HandView: View {
             .frame(minHeight: 190)
         }
         .frame(height: 230)
+        // 🔒 鉄壁の守り3：手札エリア全体のタップ判定をオフにする（ダメ押し）
+        .allowsHitTesting(!manager.isProcessing)
     }
 }

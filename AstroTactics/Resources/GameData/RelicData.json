@@ -15,6 +15,70 @@
       "imageName": "shield.fill",
       "trigger": "onTurnStart",
       "effect": { "type": "gainShield", "amount": 3 }
+    },
+    {
+      "id": "plasma_reactor",
+      "name": "プラズマリアクター",
+      "description": "毎ターンの開始時、エナジーを1得る。",
+      "imageName": "bolt.circle.fill",
+      "trigger": "onTurnStart",
+      "effect": { "type": "gainEnergy", "amount": 1 }
+    },
+    {
+      "id": "titanium_hull",
+      "name": "チタン装甲",
+      "description": "戦闘開始時、シールドを10得る。",
+      "imageName": "shield.lefthalf.filled",
+      "trigger": "onBattleStart",
+      "effect": { "type": "gainShield", "amount": 10 }
+    },
+    {
+      "id": "repair_bot",
+      "name": "リペアボット",
+      "description": "戦闘開始時、HPを5回復する。",
+      "imageName": "cross.case.fill",
+      "trigger": "onBattleStart",
+      "effect": { "type": "heal", "amount": 5 }
+    },
+    {
+      "id": "combat_stimulant",
+      "name": "戦闘用興奮剤",
+      "description": "戦闘開始時、筋力が1上昇する。",
+      "imageName": "flame.fill",
+      "trigger": "onBattleStart",
+      "effect": { "type": "gainStrength", "amount": 1 }
+    },
+    {
+      "id": "deflector_array",
+      "name": "ディフレクター",
+      "description": "毎ターンの開始時、シールドを2得る。",
+      "imageName": "sparkles",
+      "trigger": "onTurnStart",
+      "effect": { "type": "gainShield", "amount": 2 }
+    },
+    {
+      "id": "overdrive_core",
+      "name": "オーバードライブ",
+      "description": "戦闘開始時、エナジーを2得る。",
+      "imageName": "bolt.car.fill",
+      "trigger": "onBattleStart",
+      "effect": { "type": "gainEnergy", "amount": 2 }
+    },
+    {
+      "id": "medkit",
+      "name": "救急キット",
+      "description": "戦闘開始時、HPを10回復する。",
+      "imageName": "heart.fill",
+      "trigger": "onBattleStart",
+      "effect": { "type": "heal", "amount": 10 }
+    },
+    {
+      "id": "berserker_chip",
+      "name": "バーサーカーチップ",
+      "description": "毎ターンの開始時、筋力が1上昇する。",
+      "imageName": "bolt.heart.fill",
+      "trigger": "onTurnStart",
+      "effect": { "type": "gainStrength", "amount": 1 }
     }
   ]
 }

@@ -33,6 +33,8 @@ enum RelicTrigger {
 enum RelicEffectType {
     case gainEnergy
     case gainShield
+    case heal
+    case gainStrength
 }
 
 struct Relic: Identifiable {

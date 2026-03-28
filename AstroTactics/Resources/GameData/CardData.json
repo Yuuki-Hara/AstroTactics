@@ -86,7 +86,7 @@
       "cost": 2,
       "traits": ["beam"],
       "target": "singleEnemy",
-      "effects": [{ "type": "damage", "amount": 18 }]
+      "effects": [{ "type": "damage", "amount": 24 }]
     },
     {
       "baseId": "quick_shot",
