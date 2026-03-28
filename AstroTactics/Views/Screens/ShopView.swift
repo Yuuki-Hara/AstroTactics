@@ -19,9 +19,8 @@ struct ShopView: View {
             Color(red: 0.1, green: 0.15, blue: 0.25).ignoresSafeArea()
             
             VStack(spacing: 20) {
-                // ... 🏷️ ヘッダー部分はそのまま ...
                 HStack {
-                    VStack(alignment: .leading) {
+                    HStack(spacing: 8) {
                         Text("宇宙商人")
                             .font(.largeTitle).bold()
                             .foregroundColor(.white)
@@ -30,18 +29,6 @@ struct ShopView: View {
                             .foregroundColor(.gray)
                     }
                     Spacer()
-                    // 💰 所持金
-                    HStack(spacing: 8) {
-                        Image(systemName: "dollarsign.circle.fill")
-                            .foregroundColor(.yellow)
-                            .font(.title)
-                        Text("\(runManager.player.credits)")
-                            .font(.title).bold()
-                            .foregroundColor(.white)
-                    }
-                    .padding()
-                    .background(Color.black.opacity(0.5))
-                    .cornerRadius(10)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -50,12 +37,12 @@ struct ShopView: View {
                     VStack(alignment: .leading, spacing: 30) {
                         
                         // 🃏 カードの陳列棚
-                        Text("📦 カード").font(.title2).bold().foregroundColor(.white).padding(.horizontal, 20)
+                        Text("カード").font(.title2).bold().foregroundColor(.white).padding(.horizontal, 20)
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 20) {
                                 ForEach(0..<shopManager.shopCards.count, id: \.self) { index in
                                     if shopManager.shopCards[index].isSold {
-                                        soldOutView(width: 140, height: 200)
+                                        SoldOutView()
                                     } else {
                                         shopCardUI(item: shopManager.shopCards[index], index: index)
                                     }
@@ -65,12 +52,12 @@ struct ShopView: View {
                         }
                         
                         // 💎 レリックの陳列棚
-                        Text("💎 レリック").font(.title2).bold().foregroundColor(.white).padding(.horizontal, 20)
+                        Text("レリック").font(.title2).bold().foregroundColor(.white).padding(.horizontal, 20)
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 20) {
                                 ForEach(0..<shopManager.shopRelics.count, id: \.self) { index in
                                     if shopManager.shopRelics[index].isSold {
-                                        soldOutView(width: 140, height: 160)
+                                        SoldOutView()
                                     } else {
                                         shopRelicUI(item: shopManager.shopRelics[index], index: index)
                                     }
@@ -80,10 +67,10 @@ struct ShopView: View {
                         }
                         
                         // 🗑️ サービスの陳列棚
-                        Text("🛠️ サービス").font(.title2).bold().foregroundColor(.white).padding(.horizontal, 20)
+                        Text("サービス").font(.title2).bold().foregroundColor(.white).padding(.horizontal, 20)
                         HStack {
                             if shopManager.isRemovalSoldOut {
-                                soldOutView(width: 160, height: 100)
+                                SoldOutView()
                             } else {
                                 removalServiceUI()
                             }
@@ -112,7 +99,19 @@ struct ShopView: View {
             shopManager.setupShop()
         }
         .sheet(isPresented: $showRemovalSheet) {
-            removalSheetView
+            // 🗑️ 今作った汎用ビューに、タイトルと「消す処理」を渡すだけ！
+            CardGridView(
+                title: "廃棄するカードを選んでください",
+                cards: runManager.masterDeck,
+                onSelect: { selectedCard in
+                    // カードがタップされたら、マネージャーに消してもらう！
+                    shopManager.removeCardFromDeck(cardId: selectedCard.id, runManager: runManager)
+                    showRemovalSheet = false
+                },
+                onCancel: {
+                    showRemovalSheet = false
+                }
+            )
         }
     }
     
@@ -122,7 +121,6 @@ struct ShopView: View {
         return VStack(spacing: 12) {
             CardView(card: item.card).scaleEffect(0.8).frame(width: 140, height: 200)
             buyButton(price: item.price, canAfford: canAfford) {
-                // 🌟 修正：購入時に runManager を渡す！
                 shopManager.buyCard(at: index, runManager: runManager)
             }
         }
@@ -132,27 +130,8 @@ struct ShopView: View {
     private func shopRelicUI(item: ShopRelicItem, index: Int) -> some View {
         let canAfford = runManager.player.credits >= item.price
         return VStack(spacing: 12) {
-            VStack {
-                Image(systemName: item.relic.imageName)
-                    .font(.system(size: 40))
-                    .foregroundColor(.cyan)
-                    .padding()
-                Text(item.relic.name)
-                    .font(.headline).bold()
-                    .foregroundColor(.white)
-                Text(item.relic.description)
-                    .font(.caption2)
-                    .foregroundColor(.gray)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 5)
-            }
-            .frame(width: 140, height: 160)
-            .background(Color.black.opacity(0.8))
-            .cornerRadius(12)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cyan, lineWidth: 2))
             
+            RelicView(relic: item.relic)
             buyButton(price: item.price, canAfford: canAfford) {
                 // 🌟 修正：購入時に runManager を渡す！
                 shopManager.buyRelic(at: index, runManager: runManager)
@@ -164,19 +143,7 @@ struct ShopView: View {
     private func removalServiceUI() -> some View {
         let canAfford = runManager.player.credits >= shopManager.removalPrice
         return VStack(spacing: 12) {
-            VStack {
-                Image(systemName: "trash.fill")
-                    .font(.system(size: 30))
-                    .foregroundColor(.red)
-                Text("カードを廃棄")
-                    .font(.headline).bold()
-                    .foregroundColor(.white)
-            }
-            .frame(width: 160, height: 100)
-            .background(Color.black.opacity(0.8))
-            .cornerRadius(12)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.red, lineWidth: 2))
-            
+            RemovalView()
             buyButton(price: shopManager.removalPrice, canAfford: canAfford) {
                 showRemovalSheet = true
             }
@@ -188,60 +155,8 @@ struct ShopView: View {
         Button(action: {
             if canAfford { action() }
         }) {
-            HStack(spacing: 4) {
-                Image(systemName: "dollarsign.circle.fill")
-                Text("\(price)").bold()
-            }
-            .foregroundColor(canAfford ? .black : .gray)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .background(canAfford ? Color.yellow : Color.black)
-            .cornerRadius(8)
-            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.yellow, lineWidth: canAfford ? 0 : 1))
+            BuyButtonView(price: price, canAfford: canAfford)
         }
         .disabled(!canAfford)
-    }
-    
-    // MARK: - ❌ 売り切れUI
-    private func soldOutView(width: CGFloat, height: CGFloat) -> some View {
-        VStack {
-            Spacer()
-            Text("SOLD OUT")
-                .font(.title2).bold()
-                .foregroundColor(.red)
-                .rotationEffect(.degrees(-15))
-            Spacer()
-        }
-        .frame(width: width, height: height)
-        .background(Color.black.opacity(0.3))
-        .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3), lineWidth: 2))
-    }
-        
-    
-    // MARK: - 📝 廃棄カードを選択する画面（シート）
-    private var removalSheetView: some View {
-        ZStack {
-            Color(red: 0.1, green: 0.1, blue: 0.15).ignoresSafeArea()
-            VStack {
-                Text("廃棄するカードを1枚選んでください").font(.title2).bold().foregroundColor(.white).padding()
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 20) {
-                        ForEach(runManager.masterDeck) { card in
-                            Button(action: {
-                                // 🌟 修正：削除時に runManager を渡す！
-                                shopManager.removeCardFromDeck(cardId: card.id, runManager: runManager)
-                                showRemovalSheet = false
-                            }) {
-                                CardView(card: card).scaleEffect(0.8).frame(width: 140, height: 200)
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                        }
-                    }
-                    .padding()
-                }
-                Button("キャンセル") { showRemovalSheet = false }.foregroundColor(.red).padding()
-            }
-        }
     }
 }

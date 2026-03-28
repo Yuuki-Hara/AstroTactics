@@ -11,6 +11,9 @@ import SwiftUI
 struct TopStatusBarView: View {
     var runManager: RunManager
     
+    @State private var showDeckSheet = false
+    @State private var showRelicSheet = false
+    
     var body: some View {
         HStack(spacing: 16) {
             // ❤️ HPの表示
@@ -32,25 +35,60 @@ struct TopStatusBarView: View {
             }
             
             Spacer()
+            // 🔍 デッキ確認ボタン
+            Button(action: { showDeckSheet = true }) {
+                Image(systemName: "square.stack.3d.up.fill")
+                    .font(.title2)
+                    .foregroundColor(.white)
+            }
             
-            // 💎 持っているレリックの一覧（横スクロール）
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
-                    ForEach(runManager.relics) { relic in
-                        Image(systemName: relic.imageName)
-                            .font(.title3)
-                            .foregroundColor(.cyan)
-                            // レリックのアイコンに、うっすら背景と枠をつけてリッチに！
-                            .padding(6)
-                            .background(Color.black.opacity(0.5))
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.cyan.opacity(0.5), lineWidth: 1))
-                    }
-                }
+            // 💎 レリック確認ボタン
+            Button(action: { showRelicSheet = true }) {
+                Image(systemName: "sparkles")
+                    .font(.title2)
+                    .foregroundColor(.cyan)
             }
         }
         .padding(.horizontal)
         .padding(.vertical, 10)
         .background(Color.black.opacity(0.8)) // バーの背景を黒っぽくする
+        // 🌟 デッキ確認シート（onSelect は nil なので、ただ見るだけ！）
+        .sheet(isPresented: $showDeckSheet) {
+            CardGridView(
+                title: "現在のマスターデッキ (\(runManager.masterDeck.count)枚)",
+                cards: runManager.masterDeck,
+                onSelect: nil,
+                onCancel: { showDeckSheet = false }
+            )
+        }
+        // 🌟 レリック確認シート（とりあえず今は簡易的なリストで表示）
+        .sheet(isPresented: $showRelicSheet) {
+            relicSheetView
+        }
+    }
+    private var relicSheetView: some View {
+        ZStack {
+            Color(red: 0.1, green: 0.1, blue: 0.15).ignoresSafeArea()
+            VStack {
+                Text("所持しているレリック").font(.title2).bold().foregroundColor(.white).padding()
+                if runManager.relics.isEmpty {
+                    Text("まだレリックを持っていません").foregroundColor(.gray).padding()
+                } else {
+                    List(runManager.relics) { relic in
+                        HStack(spacing: 15) {
+                            Image(systemName: relic.imageName).font(.title).foregroundColor(.cyan)
+                            VStack(alignment: .leading) {
+                                Text(relic.name).font(.headline).foregroundColor(.white)
+                                Text(relic.description).font(.caption).foregroundColor(.gray)
+                            }
+                        }
+                        .listRowBackground(Color.clear)
+                    }
+                    .listStyle(PlainListStyle())
+                }
+                Spacer()
+                Button("閉じる") { showRelicSheet = false }.foregroundColor(.red).padding()
+            }
+        }
     }
 }
