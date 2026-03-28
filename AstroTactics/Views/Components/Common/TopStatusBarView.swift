@@ -22,14 +22,6 @@ struct TopStatusBarView: View {
                     .foregroundColor(.white)
             }
             
-            // ⚡️ エナジーの表示（最大エナジー）
-            HStack(spacing: 4) {
-                Image(systemName: "bolt.fill")
-                    .foregroundColor(.yellow)
-                Text("\(runManager.player.maxEnergy)")
-                    .font(.headline).bold()
-                    .foregroundColor(.white)
-            }
             // 🌟 TopStatusBarView.swift の HStack の中（エナジーの隣など）に追加
             HStack(spacing: 4) {
                 Image(systemName: "dollarsign.circle.fill")
