@@ -107,8 +107,8 @@ class BattleManager {
         turnCount += 1
         if turnCount != 1 {
             player.resetEnergy()
+            player.shield = 0
         }
-        player.shield = 0
         await triggerRelics(on: .onTurnStart)
         await showMessage(GameSettings.messages.playerTurnStart, duration: 0.8)
         await changeState(to: .playerAction)
