@@ -219,7 +219,10 @@ class BattleManager {
         
         let allEnemiesDefeated = enemies.allSatisfy { $0.currentHP <= 0 }
         if allEnemiesDefeated {
-            self.earnedCredits = Int.random(in: 10...25)
+            let minReward = GameSettings.config.battleRewardMin
+            let maxReward = GameSettings.config.battleRewardMax
+            self.earnedCredits = Int.random(in: minReward...maxReward)
+            
             player.credits += self.earnedCredits
             await changeState(to: .victory)
             return true

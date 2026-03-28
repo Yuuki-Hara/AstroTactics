@@ -32,8 +32,10 @@ struct ShopView: View {
     // 🗑️ 追加：カード廃棄サービス用の変数
     @State private var isRemovalSoldOut: Bool = false
     @State private var showRemovalSheet: Bool = false
-    let removalPrice: Int = 75 // 廃棄サービスの値段（Slay the Spireリスペクト！）
     
+    var removalPrice: Int {
+            GameSettings.config.shopRemovalPrice
+        }
     var body: some View {
         ZStack {
             Color(red: 0.1, green: 0.15, blue: 0.25).ignoresSafeArea()
@@ -157,10 +159,16 @@ struct ShopView: View {
     // MARK: - 🛍️ お店の準備
     private func setupShop() {
         let randomCards = CardDatabase.allCardsData.shuffled().prefix(3)
-        shopCards = randomCards.map { ShopCardItem(card: $0, price: Int.random(in: 40...80)) }
+        shopCards = randomCards.map {
+            let price = Int.random(in: GameSettings.config.shopCardPriceMin...GameSettings.config.shopCardPriceMax)
+            return ShopCardItem(card: $0, price: price)
+        }
         
         let randomRelics = RelicDatabase.allRelics.shuffled().prefix(2)
-        shopRelics = randomRelics.map { ShopRelicItem(relic: $0, price: Int.random(in: 120...200)) }
+        shopRelics = randomRelics.map {
+            let price = Int.random(in: GameSettings.config.shopRelicPriceMin...GameSettings.config.shopRelicPriceMax)
+            return ShopRelicItem(relic: $0, price: price)
+        }
     }
     
     // MARK: - 🃏 カード販売UI

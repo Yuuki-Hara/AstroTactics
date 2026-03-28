@@ -8,6 +8,11 @@
 
 import Foundation
 
+struct GameSettingsData: Codable {
+    let config: GameConfigJSON
+    let messages: MessageDataJSON
+}
+
 // MARK: - JSONの受け皿（型）
 struct GameConfigJSON: Codable {
     let playerShipName: String
@@ -19,6 +24,14 @@ struct GameConfigJSON: Codable {
     let bossFieldName: String
     let treasureFieldName: String
     let shopFieldName: String
+    
+    let battleRewardMin: Int
+    let battleRewardMax: Int
+    let shopCardPriceMin: Int
+    let shopCardPriceMax: Int
+    let shopRelicPriceMin: Int
+    let shopRelicPriceMax: Int
+    let shopRemovalPrice: Int
 }
 
 struct MessageDataJSON: Codable {
@@ -47,14 +60,12 @@ struct GameSettings {
     
     // 🌟 アプリ起動時に一括で読み込む
     static func loadAll() {
-        if let loadedConfig = DataLoader.load("GameConfig", as: GameConfigJSON.self) {
-            config = loadedConfig
-            print("✅ ゲーム基本ルール（Config）を読み込みました！")
-        }
-        
-        if let loadedMessages = DataLoader.load("MessageData", as: MessageDataJSON.self) {
-            messages = loadedMessages
-            print("✅ UIテキスト（Message）を読み込みました！")
+        if let loadData = DataLoader.load("GameSettings", as: GameSettingsData.self) {
+            config = loadData.config
+            messages = loadData.messages
+            print("✅ ゲーム設定（GameSettings.json）を統合して読み込みました！")
+        } else {
+            print("❌ GameSettingsの読み込みに失敗しました！")
         }
     }
 }
