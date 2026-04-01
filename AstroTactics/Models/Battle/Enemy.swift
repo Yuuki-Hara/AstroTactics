@@ -25,7 +25,6 @@ class Enemy: CombatEntity, Identifiable {
     
     var maxHP: Int
     var currentHP: Int
-    var shield: Int = 0
     var statuses: [StatusType: Int] = [:]
     
     var intent: EnemyIntent?

@@ -12,13 +12,13 @@ import Observation
 // HPなど状態が変化していくため、StructではなくClass（参照型）で定義します
 @Observable
 class PlayerShip: CombatEntity {
+    
     var name: String
     var maxHP: Int
     var currentHP: Int
-    var shield: Int = 0
     var strength: Int = 0
     var statuses: [StatusType: Int] = [:]
-    var credits: Int = 200
+    var credits: Int = 500
     
     var maxEnergy: Int
     var currentEnergy: Int

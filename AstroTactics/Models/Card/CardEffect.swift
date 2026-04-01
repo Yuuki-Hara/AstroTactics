@@ -39,7 +39,7 @@ struct GainShieldEffect: CardEffect {
     
     @MainActor
     func execute(manager: BattleManager, target: Enemy?) async {
-        manager.player.shield += amount
+        manager.player.addShield(baseAmount: amount)
         await manager.showMessage(BattleMessageFormatter.shieldGained(amount: amount))
     }
 }
