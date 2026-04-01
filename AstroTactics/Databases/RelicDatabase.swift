@@ -36,6 +36,12 @@ struct RelicDatabase {
         }
     }
     
+    // 🌟 セーブデータからレリックを復元するための機能
+    static func getRelic(by id: String) -> Relic? {
+        // IDが一致するものを探して返す（レリックがクラスか構造体かによってコピーの必要性は変わりますが、基本はこれでOKです）
+        return allRelics.first(where: { $0.id == id })
+    }
+    
     private static func convert(json: RelicJSON) -> Relic? {
         // 発動タイミングの翻訳
         let trigger: RelicTrigger
