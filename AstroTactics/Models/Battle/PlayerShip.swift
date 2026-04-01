@@ -18,7 +18,7 @@ class PlayerShip: CombatEntity {
     var shield: Int = 0
     var strength: Int = 0
     var statuses: [StatusType: Int] = [:]
-    var credits: Int = 500
+    var credits: Int = 200
     
     var maxEnergy: Int
     var currentEnergy: Int

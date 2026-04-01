@@ -1,0 +1,38 @@
+{
+    "config": {
+        "playerShipName": "アストロ戦艦",
+        "playerStartingHP": 50,
+        "playerStartingEnergy": 3,
+        "restHealPercentage": 0.3,
+        "battleFieldName": "敵艦隊",
+        "restFieldName": "宇宙ステーション",
+        "bossFieldName": "ボス戦艦",
+        "treasureFieldName": "宝箱",
+        "shopFieldName": "ショップ",
+        
+        "battleRewardMin": 10,
+        "battleRewardMax": 25,
+        "shopCardPriceMin": 40,
+        "shopCardPriceMax": 80,
+        "shopRelicPriceMin": 120,
+        "shopRelicPriceMax": 200,
+        "shopRemovalPrice": 75
+    },
+    "messages": {
+        "mapTitle": "星域マップ",
+        "restTitle": "宇宙ステーション",
+        "restDescription": "安全な宙域に到達した。\n船体を修理し、次の戦いに備えよう。",
+        "restHealButton": "修理する",
+        "restHealSubText": "HPを%d%%回復",
+        "gameClearTitle": "MISSION COMPLETE",
+        "gameClearSubText1": "帝国軍 殲滅旗艦を撃破し、\nこの星域に平和が訪れた…！",
+        "gameClearSubText2": "見事な指揮でした、艦長。",
+        "returnToTitle": "タイトルへ戻る",
+        "playerTurnStart": "あなたのターン",
+        "enemyAction": "敵の攻撃！",
+        "turnEnd": "ターン終了",
+        "goNext": "次へ進む",
+        "missionClear": "MISSION CLEAR",
+        "gameOver": "GAME OVER"
+    }
+}

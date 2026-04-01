@@ -85,6 +85,23 @@ struct CardDatabase {
     }
     
     // MARK: - カードの取得
+    static func getCard(by baseId: String) -> Card? {
+        // allCardsData から、同じ baseId を持つカードの設計図を探す
+        guard let blueprint = allCardsData.first(where: { $0.baseId == baseId }) else {
+            return nil // 見つからなければ nil を返す
+        }
+        
+        // 設計図から、全く新しいカードのコピーを作って返す（これが超重要！）
+        return Card(
+            baseId: blueprint.baseId,
+            name: blueprint.name,
+            cost: blueprint.cost,
+            traits: blueprint.traits,
+            target: blueprint.target,
+            effects: blueprint.effects
+            // UUIDはCardの初期化時に自動で新しいものが振られます
+        )
+    }
     
     // JSONから読み込んだ初期デッキを返す
     static func startingDeck() -> [Card] {

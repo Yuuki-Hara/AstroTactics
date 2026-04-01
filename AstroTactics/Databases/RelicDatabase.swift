@@ -25,28 +25,6 @@ struct RelicEffectJSON: Codable {
     let amount: Int
 }
 
-// MARK: - ゲーム内で使うレリックの型
-enum RelicTrigger {
-    case onBattleStart // 戦闘開始時
-    case onTurnStart   // 自分のターン開始時
-}
-enum RelicEffectType {
-    case gainEnergy
-    case gainShield
-    case heal
-    case gainStrength
-}
-
-struct Relic: Identifiable {
-    let id: String
-    let name: String
-    let description: String
-    let imageName: String
-    let trigger: RelicTrigger
-    let effectType: RelicEffectType
-    let amount: Int
-}
-
 // MARK: - データベース本体
 struct RelicDatabase {
     static var allRelics: [Relic] = []
@@ -56,6 +34,12 @@ struct RelicDatabase {
             allRelics = catalog.relics.compactMap { convert(json: $0) }
             print("✅ レリックデータを \(allRelics.count) 件読み込みました！")
         }
+    }
+    
+    // 🌟 セーブデータからレリックを復元するための機能
+    static func getRelic(by id: String) -> Relic? {
+        // IDが一致するものを探して返す（レリックがクラスか構造体かによってコピーの必要性は変わりますが、基本はこれでOKです）
+        return allRelics.first(where: { $0.id == id })
     }
     
     private static func convert(json: RelicJSON) -> Relic? {
