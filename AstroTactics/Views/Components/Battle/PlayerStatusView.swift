@@ -31,11 +31,6 @@ struct PlayerStatusView: View {
                     .foregroundColor(.white)
                 Spacer()
                 StatusEffectRowView(statuses: player.statuses)
-                if player.shield > 0 {
-                    Text("シールド: \(player.shield)")
-                        .foregroundColor(.blue)
-                        .bold()
-                }
             }
             .font(.caption)
             .padding(.horizontal, 40)

@@ -89,7 +89,7 @@ class BattleManager {
                 print("💎 レリック発動！[\(relic.name)] エナジーを\(relic.amount)回復！")
                 await showMessage(BattleMessageFormatter.gainEnergyByRelic(name: relic.name, amount: relic.amount), duration: 1.2)
             case .gainShield:
-                player.shield += relic.amount
+                player.statuses[.shield, default: 0] += relic.amount
                 print("💎 レリック発動！[\(relic.name)] シールドを\(relic.amount)獲得！")
                 await showMessage(BattleMessageFormatter.gainShieldByRelic(name: relic.name, amount: relic.amount), duration: 1.2)
             // 💖 追加：HP回復
@@ -108,7 +108,6 @@ class BattleManager {
     @MainActor private func handleBattleStart() async {
         deckManager.drawCard(count: 5)
         player.resetEnergy()
-        player.statuses = [:]
         for enemy in enemies { enemy.determineNextIntent() }
         await triggerRelics(on: .onBattleStart)
         await wait(seconds: 1.0)
@@ -116,25 +115,35 @@ class BattleManager {
     }
     
     @MainActor private func handlePlayerTurnStart() async {
+        
         turnCount += 1
         if turnCount != 1 {
             player.resetEnergy()
-            player.shield = 0
+            player.applyStartOfTurnLogic()
         }
         await triggerRelics(on: .onTurnStart)
+        
+        // 🌟 修正：プレイヤー自身に「動けるか？」を聞く！
+        if !player.canAct() {
+            await showMessage(GameSettings.messages.playerCannotAct, duration: 1.5)
+            await changeState(to: .playerTurnEnd)
+            return
+        }
         await showMessage(GameSettings.messages.playerTurnStart, duration: 0.8)
         await changeState(to: .playerAction)
     }
     
     @MainActor private func handlePlayerTurnEnd() async {
         deckManager.discardHand()
-        player.decrementStatuses()
+        player.applyEndOfTurnLogic()
         await wait(seconds: 0.5)
         await changeState(to: .enemyTurnStart)
     }
     
     @MainActor private func handleEnemyTurnStart() async {
-        for enemy in enemies where enemy.currentHP > 0 { enemy.shield = 0 }
+        for enemy in enemies where enemy.currentHP > 0 {
+            enemy.applyStartOfTurnLogic()
+        }
         await wait(seconds: 0.5)
         await changeState(to: .enemyAction)
     }
@@ -143,6 +152,10 @@ class BattleManager {
         await showMessage(GameSettings.messages.enemyAction)
         
         for enemy in enemies where enemy.currentHP > 0 {
+            if !enemy.canAct() {
+                await showMessage(String(format: GameSettings.messages.enemyCannotAct,enemy.name), duration: 1.2)
+                continue
+            }
             guard let intent = enemy.intent else { continue }
             await executeEnemyIntent(intent, for: enemy)
         }
@@ -155,7 +168,7 @@ class BattleManager {
     @MainActor private func handleEnemyTurnEnd() async {
         for enemy in enemies where enemy.currentHP > 0 {
             enemy.determineNextIntent()
-            enemy.decrementStatuses()
+            enemy.applyEndOfTurnLogic()
         }
         deckManager.drawCard(count: 5)
         await wait(seconds: 0.5)
@@ -166,12 +179,12 @@ class BattleManager {
         switch intent {
         case .attack(let damage):
             await showMessage(BattleMessageFormatter.enemyAttack(enemyName: enemy.name), duration: 0.8)
-            let result = player.takeDamage(amount: damage)
-            let msg = BattleMessageFormatter.damage(targetName: enemy.name, hpDamage: result.damageToHP, blocked: result.blocked)
+            let result = player.takeDamage(baseAmount: damage, attacker: enemy)
+            let msg = BattleMessageFormatter.damage(targetName: player.name, hpDamage: result.damageToHP, blocked: result.blocked)
             await showMessage(msg, duration: 1.2)
             
         case .defend(let amount):
-            enemy.shield += amount
+            enemy.statuses[.shield, default: 0] += amount
             await showMessage(BattleMessageFormatter.enemyDefend(enemyName: enemy.name, amount: amount), duration: 1.2)
         case .charge:
             await showMessage(BattleMessageFormatter.enemyCharge(enemyName: enemy.name), duration: 1.2)
@@ -236,6 +249,7 @@ class BattleManager {
             self.earnedCredits = Int.random(in: minReward...maxReward)
             
             player.credits += self.earnedCredits
+            player.resetStatuses()
             await changeState(to: .victory)
             return true
         }

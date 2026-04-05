@@ -25,8 +25,13 @@ class Enemy: CombatEntity, Identifiable {
     
     var maxHP: Int
     var currentHP: Int
-    var shield: Int = 0
     var statuses: [StatusType: Int] = [:]
+//    var statuses: [StatusType: Int] = [
+//        .emp: 2,             // ⚡️ 2ターンの間、行動不能になるかテスト
+//        .target: 3,          // 🎯 ターゲット（被ダメージ増加）
+//        .strength: 2,        // ⚔️ 筋力（EMPが切れた後の攻撃力アップ）
+//        .shield: 10          // 🛡 最初からシールドを持っている状態
+//    ]
     
     var intent: EnemyIntent?
     var turnCount: Int = 0
