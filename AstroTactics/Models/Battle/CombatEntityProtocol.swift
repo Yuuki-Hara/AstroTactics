@@ -96,7 +96,7 @@ extension CombatEntity {
   }
 
   func addstrength(baseAmount: Int) {
-    statuses[.tempStrength, default: 0] += baseAmount
+    statuses[.strength, default: 0] += baseAmount
     print("🛡 力強化獲得: 獲得量\(baseAmount)")
   }
 

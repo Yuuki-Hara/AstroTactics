@@ -6,32 +6,7 @@
 //
 import Foundation
 
-// MARK: - JSONを読み込むための型
-struct EnemyCatalog: Codable {
-  let enemies: [EnemyJSON]
-}
-
-struct EnemyJSON: Codable {
-  let category: String
-  let name: String
-  let imageName: String
-  let maxHP: Int
-  let behaviorAI: AIJSON  // 🌟 AI情報を追加
-}
-
-// 🌟 AIの設計図
-struct AIJSON: Codable {
-  let type: String  // "random" か "rotation"
-  let moves: [MoveJSON]
-}
-
-// 🌟 1つ1つの行動の設計図
-struct MoveJSON: Codable {
-  let intent: String
-  let amount: Int?  // 固定値（例: 25ダメージ）
-  let min: Int?  // ランダムの最小値
-  let max: Int?  // ランダムの最大値
-}
+// NOTE: DTO types for Enemy are defined in Services/DTOs/EnemyDTO.swift
 
 // MARK: - 敵データベース本体
 struct EnemyDatabase {
@@ -42,8 +17,7 @@ struct EnemyDatabase {
   // 🌟 アプリ起動時にJSONを読み込む関数
   static func loadFromJSON() {
     do {
-      let catalog = try JSONLoader.load("EnemyData", as: EnemyCatalog.self)
-      allEnemiesData = catalog.enemies
+      allEnemiesData = try EnemyRepository.loadAll()
       print("✅ 敵データを \(allEnemiesData.count) 件読み込みました！")
     } catch {
       print("🚨 EnemyDatabase: failed to load EnemyData.json: \(error)")
@@ -65,6 +39,7 @@ struct EnemyDatabase {
         behaviorAI: dummyAI)
     }
 
+    // DTO uses `ai` field name for behavior info
     return Enemy(
       category: template.category, name: template.name, imageName: template.imageName,
       maxHP: template.maxHP, behaviorAI: template.behaviorAI)

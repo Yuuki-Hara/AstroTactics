@@ -24,7 +24,7 @@ struct JSONLoaderTests {
 
   @Test("レリックデータが読み込めること")
   func testLoadRelicData() {
-    let catalog: RelicCatalog? = DataLoader.load("RelicData", as: RelicCatalog.self)
+    let catalog: RelicCatalogDTO? = DataLoader.load("RelicData", as: RelicCatalogDTO.self)
     #expect(catalog != nil, "RelicData が読み込まれること")
     if let c = catalog {
       #expect(c.relics.count > 0, "relics が空でないこと")

@@ -43,7 +43,7 @@
     {
       "id": "combat_stimulant",
       "name": "戦闘用興奮剤",
-      "description": "戦闘開始時、筋力が1上昇する。",
+      "description": "戦闘中、筋力が1上昇する。",
       "imageName": "flame.fill",
       "trigger": "onBattleStart",
       "effect": { "type": "gainStrength", "amount": 1 }

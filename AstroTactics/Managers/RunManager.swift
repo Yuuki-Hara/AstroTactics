@@ -139,7 +139,7 @@ class RunManager {
   // MARK: - JSONファイルの読み込み処理
   private func loadMapData() {
     do {
-      let decodedData = try JSONLoader.load("MapData", as: MapData.self)
+      let decodedData = try MapRepository.load()
       self.mapFloors = decodedData.floors
       print("✅ マップデータを読み込みました！")
     } catch {

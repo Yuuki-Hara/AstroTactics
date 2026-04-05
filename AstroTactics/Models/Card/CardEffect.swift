@@ -138,7 +138,7 @@ struct DealRandomDamageEffect: CardEffect {
 
 struct GainStrengthEffect: CardEffect {
   let amount: Int
-  var description: String { "攻撃力が \(amount) ターン上昇" }
+  var description: String { "攻撃力が \(amount) 上昇" }
 
   @MainActor
   func execute(manager: BattleManager, target: Enemy?) async {
