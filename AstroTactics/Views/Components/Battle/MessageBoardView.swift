@@ -8,11 +8,11 @@
 import SwiftUI
 
 struct MessageBoardView: View {
-    var message: String
-    var body: some View {
-        Text(message)
-            .font(.title2).bold()
-            .foregroundColor(.yellow)
-            .padding()
-    }
+  var message: String
+  var body: some View {
+    Text(message)
+      .font(.title2).bold()
+      .foregroundColor(.yellow)
+      .padding()
+  }
 }

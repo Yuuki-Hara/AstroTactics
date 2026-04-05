@@ -102,6 +102,7 @@
 				B6EA84DF2F6ECED300672662 /* Sources */,
 				B6EA84E02F6ECED300672662 /* Frameworks */,
 				B6EA84E12F6ECED300672662 /* Resources */,
+				B603FBD12F82A0340014FF80 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -230,6 +231,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B603FBD12F82A0340014FF80 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Apple Silicon (M1/M2/M3) MacなどでHomebrew版のSwiftLintを動かすためのパス設定\nexport PATH=\"$PATH:/opt/homebrew/bin:/usr/local/bin\"\n\n# 1. Xcode内蔵の swift-format でコードの見た目を自動整形（上書き）\n# $SRCROOT は、Xcodeが自動的にプロジェクトフォルダのパスに置き換えてくれる変数です\nxcrun swift-format format -i -r \"$SRCROOT\"\n\n# 2. SwiftLint でコードの書き方（バグの元など）をチェック\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint is not installed or not found in PATH.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B6EA84DF2F6ECED300672662 /* Sources */ = {
@@ -401,6 +423,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H3F6WNQYD6;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -433,6 +456,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = H3F6WNQYD6;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

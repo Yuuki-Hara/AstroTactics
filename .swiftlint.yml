@@ -1,0 +1,33 @@
+# SwiftLint configuration for AstroTactics
+# See: https://github.com/realm/SwiftLint
+
+included:
+  - AstroTactics
+  - Tests
+
+excluded:
+  - Resources
+  - Pods
+  - Carthage
+  - .build
+
+# Allow longer lines for readability in UI code
+line_length: 120
+
+# Rules to disable when migrating an existing codebase — keep these as pragmatic defaults
+disabled_rules:
+  - force_cast
+  - force_try
+  - force_unwrapping
+  - trailing_whitespace
+  - todo
+  - trailing_comma
+  - opening_brace
+  - closure_parameter_position
+
+# Optional rules to enable for stricter code style as project matures
+opt_in_rules:
+  - empty_count
+  - explicit_init
+
+reporter: "xcode"

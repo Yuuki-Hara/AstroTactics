@@ -1,0 +1,6 @@
+# Ignore non-swift files and resources
+Resources/
+*.json
+*.xcassets
+*.png
+*.jpg

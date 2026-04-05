@@ -1,0 +1,17 @@
+# SwiftFormat configuration for AstroTactics
+# See: https://github.com/nicklockwood/SwiftFormat
+
+# Max line length (make consistent with SwiftLint)
+--maxwidth 120
+
+# Indentation
+--indent 4
+
+# Use the Swift community defaults for most rules, but enable a few explicit ones
+--trailingCommas remove
+--semicolons inline
+--commas whitespace
+--insertBlankLines enable
+
+# Don't modify code in Resources or JSON
+--exclude Resources
