@@ -20,6 +20,15 @@ struct RelicDatabase {
     }
   }
 
+  static func loadFromJSON(repository: RelicRepositoryProtocol) {
+    do {
+      allRelics = try repository.loadAll()
+      print("✅ レリックデータを \(allRelics.count) 件読み込みました！(DI)")
+    } catch {
+      print("🚨 RelicDatabase: failed to load RelicData.json via repository: \(error)")
+    }
+  }
+
   static func getRelic(by id: String) -> Relic? {
     return allRelics.first(where: { $0.id == id })
   }

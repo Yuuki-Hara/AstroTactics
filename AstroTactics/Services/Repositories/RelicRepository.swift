@@ -36,3 +36,13 @@ struct RelicRepository {
     return (try? loadAll())?.first(where: { $0.id == id })
   }
 }
+
+protocol RelicRepositoryProtocol {
+  func loadAll() throws -> [Relic]
+  func getRelic(by id: String) -> Relic?
+}
+
+struct RelicRepositoryAdapter: RelicRepositoryProtocol {
+  func loadAll() throws -> [Relic] { try RelicRepository.loadAll() }
+  func getRelic(by id: String) -> Relic? { RelicRepository.getRelic(by: id) }
+}

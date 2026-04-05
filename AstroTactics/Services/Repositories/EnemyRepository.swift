@@ -19,3 +19,16 @@ struct EnemyRepository {
     return (try? loadAll())?.filter({ $0.category != "boss" }).randomElement()
   }
 }
+
+// Protocol for DI
+protocol EnemyRepositoryProtocol {
+  func loadAll() throws -> [EnemyJSON]
+  func firstBoss() -> EnemyJSON?
+  func randomNormal() -> EnemyJSON?
+}
+
+struct EnemyRepositoryAdapter: EnemyRepositoryProtocol {
+  func loadAll() throws -> [EnemyJSON] { try EnemyRepository.loadAll() }
+  func firstBoss() -> EnemyJSON? { EnemyRepository.firstBoss() }
+  func randomNormal() -> EnemyJSON? { EnemyRepository.randomNormal() }
+}

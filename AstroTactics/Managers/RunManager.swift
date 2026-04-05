@@ -17,14 +17,34 @@ class RunManager {
 
   var player: PlayerShip
 
-  init() {
-    GameSettings.loadAll()
-    CardDatabase.loadFromJSON()
-    EnemyDatabase.loadFromJSON()
-    RelicDatabase.loadFromJSON()
+  private let saveStore: SaveStore
+
+  init(
+    saveStore: SaveStore = SaveManager.shared,
+    gameSettingsRepository: GameSettingsRepositoryProtocol = GameSettingsRepositoryAdapter(),
+    cardRepository: CardRepositoryProtocol = CardRepositoryAdapter(),
+    enemyRepository: EnemyRepositoryProtocol = EnemyRepositoryAdapter(),
+    relicRepository: RelicRepositoryProtocol = RelicRepositoryAdapter()
+  ) {
+    self.saveStore = saveStore
+
+    // Load shared settings via repository (backwards compatible)
+    do {
+      let gsr = try gameSettingsRepository.load()
+      GameSettings.config = gsr.config
+      GameSettings.messages = gsr.messages
+      print("✅ ゲーム設定（GameSettings.json）を統合して読み込みました！ (DI)")
+    } catch {
+      print("❌ GameSettingsの読み込みに失敗しました！ \(error)")
+    }
+
+    // Load card/enemy/relic data via provided repositories
+    CardDatabase.loadFromJSON(repository: cardRepository)
+    EnemyDatabase.loadFromJSON(repository: enemyRepository)
+    RelicDatabase.loadFromJSON(repository: relicRepository)
 
     // 🌟 セーブデータがあるかチェック！
-    if let savedData = SaveManager.shared.load() {
+    if let savedData = saveStore.load() {
       // ==========================================
       // 【再開】セーブデータからの復元処理
       // ==========================================
@@ -131,8 +151,8 @@ class RunManager {
       currentNodeId: self.currentNodeId
     )
 
-    // Managerを使って保存
-    SaveManager.shared.save(data: data)
+    // SaveStoreを通して保存
+    saveStore.save(data: data)
     print("💾 現在の進行状況をセーブしました")
   }
 

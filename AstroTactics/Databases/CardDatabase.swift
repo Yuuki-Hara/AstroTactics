@@ -19,6 +19,16 @@ struct CardDatabase {
     }
   }
 
+  // New method that accepts a repository for DI/testing
+  static func loadFromJSON(repository: CardRepositoryProtocol) {
+    do {
+      allCardsData = try repository.loadAll()
+      print("✅ カードデータを \(allCardsData.count) 件読み込みました！（DI経由）")
+    } catch {
+      print("🚨 CardDatabase: failed to load CardData.json via repository: \(error)")
+    }
+  }
+
   static func getCard(by baseId: String) -> Card? {
     return CardRepository.getCard(by: baseId)
   }

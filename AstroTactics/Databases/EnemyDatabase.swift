@@ -24,6 +24,16 @@ struct EnemyDatabase {
     }
   }
 
+  // DI-friendly loader
+  static func loadFromJSON(repository: EnemyRepositoryProtocol) {
+    do {
+      allEnemiesData = try repository.loadAll()
+      print("✅ 敵データを \(allEnemiesData.count) 件読み込みました！(DI)")
+    } catch {
+      print("🚨 EnemyDatabase: failed to load EnemyData.json via repository: \(error)")
+    }
+  }
+
   // MARK: - 敵の生成
 
   // 🌟 雑魚敵をランダムに生成して返す（ボス以外から選ぶ）
