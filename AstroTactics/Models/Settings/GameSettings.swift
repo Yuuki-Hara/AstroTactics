@@ -44,6 +44,8 @@ struct MessageDataJSON: Codable {
     let gameClearSubText1: String
     let gameClearSubText2: String
     let returnToTitle: String
+    let playerCannotAct: String
+    let enemyCannotAct: String
     let playerTurnStart: String
     let enemyAction: String
     let turnEnd: String

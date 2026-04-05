@@ -108,7 +108,6 @@ class BattleManager {
     @MainActor private func handleBattleStart() async {
         deckManager.drawCard(count: 5)
         player.resetEnergy()
-        player.statuses = [:]
         for enemy in enemies { enemy.determineNextIntent() }
         await triggerRelics(on: .onBattleStart)
         await wait(seconds: 1.0)
@@ -117,12 +116,19 @@ class BattleManager {
     
     @MainActor private func handlePlayerTurnStart() async {
         
-        player.applyStartOfTurnLogic()
         turnCount += 1
         if turnCount != 1 {
             player.resetEnergy()
+            player.applyStartOfTurnLogic()
         }
         await triggerRelics(on: .onTurnStart)
+        
+        // 🌟 修正：プレイヤー自身に「動けるか？」を聞く！
+        if !player.canAct() {
+            await showMessage(GameSettings.messages.playerCannotAct, duration: 1.5)
+            await changeState(to: .playerTurnEnd)
+            return
+        }
         await showMessage(GameSettings.messages.playerTurnStart, duration: 0.8)
         await changeState(to: .playerAction)
     }
@@ -146,6 +152,10 @@ class BattleManager {
         await showMessage(GameSettings.messages.enemyAction)
         
         for enemy in enemies where enemy.currentHP > 0 {
+            if !enemy.canAct() {
+                await showMessage(String(format: GameSettings.messages.enemyCannotAct,enemy.name), duration: 1.2)
+                continue
+            }
             guard let intent = enemy.intent else { continue }
             await executeEnemyIntent(intent, for: enemy)
         }
@@ -169,8 +179,8 @@ class BattleManager {
         switch intent {
         case .attack(let damage):
             await showMessage(BattleMessageFormatter.enemyAttack(enemyName: enemy.name), duration: 0.8)
-            let result = player.takeDamage(amount: damage)
-            let msg = BattleMessageFormatter.damage(targetName: enemy.name, hpDamage: result.damageToHP, blocked: result.blocked)
+            let result = player.takeDamage(baseAmount: damage, attacker: enemy)
+            let msg = BattleMessageFormatter.damage(targetName: player.name, hpDamage: result.damageToHP, blocked: result.blocked)
             await showMessage(msg, duration: 1.2)
             
         case .defend(let amount):
@@ -239,6 +249,7 @@ class BattleManager {
             self.earnedCredits = Int.random(in: minReward...maxReward)
             
             player.credits += self.earnedCredits
+            player.resetStatuses()
             await changeState(to: .victory)
             return true
         }

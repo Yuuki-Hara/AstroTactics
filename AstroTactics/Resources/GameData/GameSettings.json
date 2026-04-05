@@ -29,6 +29,8 @@
         "gameClearSubText2": "見事な指揮でした、艦長。",
         "returnToTitle": "タイトルへ戻る",
         "playerTurnStart": "あなたのターン",
+        "playerCannotAct": "EMPの影響でシステムダウン！行動不能！",
+        "enemyCannotAct": "%@はEMPで機能停止している！",
         "enemyAction": "敵の攻撃！",
         "turnEnd": "ターン終了",
         "goNext": "次へ進む",

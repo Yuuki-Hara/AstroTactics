@@ -49,10 +49,10 @@ enum StatusType: String, Codable, CaseIterable {
     // 🌟 2. アイコンの定義
     var iconName: String {
         switch self {
-        case .shield: return "shield.lefthalf.filled" // 🛡 追加
-        case .strength: return "sword.point.up.fill"
+        case .shield: return "shield.fill" // 🛡 追加
+        case .strength: return "powermeter"
         case .tempStrength: return "flame.fill"
-        case .dexterity: return "plus.shield.fill"
+        case .dexterity: return "bolt.shield.fill"
         case .target: return "scope"
         case .emp: return "bolt.slash.fill"
         }
@@ -75,7 +75,7 @@ protocol CombatEntity: AnyObject {
     var currentHP: Int { get set }
     var statuses: [StatusType: Int] { get set }
     
-    func takeDamage(amount: Int) -> (damageToHP: Int, blocked: Int)
+    func takeDamage(baseAmount: Int, attacker: CombatEntity?) -> (damageToHP: Int, blocked: Int)
     func applyStartOfTurnLogic()
     func applyEndOfTurnLogic()
 }
@@ -96,30 +96,66 @@ extension CombatEntity {
         print("🛡 シールド獲得: 基本\(baseAmount) + 装甲\(dex) = 最終獲得量\(totalGain)")
     }
     
+    func addstrength(baseAmount: Int) {
+        statuses[.tempStrength, default: 0] += baseAmount
+        print("🛡 力強化獲得: 獲得量\(baseAmount)")
+    }
+    
     @discardableResult
-    func takeDamage(amount: Int) -> (damageToHP: Int, blocked: Int) {
-        var finalDamage = amount
+    func takeDamage(baseAmount: Int, attacker: CombatEntity?) -> (damageToHP: Int, blocked: Int) {
         
-        if statuses[.target, default: 0] > 0 || statuses[.emp, default: 0] > 0 {
-            finalDamage = Int(Double(finalDamage) * 1.5)
+        var finalDamage = baseAmount
+        
+        // ==========================================
+        // ⚔️ 1. 攻撃側（Attacker）のバフ・デバフを計算
+        // ==========================================
+        if let attacker = attacker {
+            // 攻撃側の筋力を足す
+            let str = attacker.statuses[.strength, default: 0]
+            let tempStr = attacker.statuses[.tempStrength, default: 0]
+            finalDamage += (str + tempStr)
+            
+            // ※もし「弱体化（与えるダメージが減る）」などのデバフがあればここで計算します
         }
-        // 辞書からシールド値を取り出す（無ければ0）
-        let currentShield = statuses[.shield, default: 0]
         
-        if currentShield >= amount {
+        // ==========================================
+        // 🛡 2. 防御側（Self）のバフ・デバフを計算
+        // ==========================================
+        // 例: 「ターゲット」状態だと受けるダメージが +2 されるルールの場合はここに書く
+        let targetDebuff = self.statuses[.target, default: 0]
+        if targetDebuff > 0 {
+            finalDamage += 2 // 1スタックにつき+2なのか、固定で+2なのかはゲームのルール次第です
+        }
+        
+        // ※最終ダメージがマイナスにならないよう、念のため0でストッパーをかけます
+        finalDamage = max(0, finalDamage)
+        print("💥 ダメージ計算: 元\(baseAmount) -> 最終\(finalDamage)")
+        
+        // ==========================================
+        // 🛡 3. シールドの処理とHP減少
+        // ==========================================
+        let currentShield = self.statuses[.shield, default: 0]
+        
+        if currentShield >= finalDamage {
             // シールドで全ブロック
-            statuses[.shield] = currentShield - amount
-            return (0, amount)
+            self.statuses[.shield] = currentShield - finalDamage
+            return (0, finalDamage)
         } else {
             // シールド貫通
             let remainingDamage = finalDamage - currentShield
-            statuses.removeValue(forKey: .shield) // シールド破壊
-            self.currentHP -= remainingDamage
+            self.statuses.removeValue(forKey: .shield) // シールド破壊
+            self.currentHP = max(0, self.currentHP - remainingDamage)
             return (remainingDamage, currentShield)
         }
     }
     
-    // 例: CombatEntity（PlayerShip や Enemy）の中の処理
+    func canAct() -> Bool {
+        // EMPのスタックが0以下なら行動可能！
+        let empCount = statuses[.emp, default: 0]
+        return empCount <= 0
+        
+        // ※将来「睡眠」や「凍結」が増えたら、ここに条件を書き足すだけでOKです
+    }
 
     /// 🌟 自分のターンが始まった時の処理
     func applyStartOfTurnLogic() {

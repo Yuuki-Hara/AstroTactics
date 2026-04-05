@@ -33,19 +33,12 @@ struct StatusEffectRowView: View {
         return activeKeys
     }
     
+    let columns = [
+        GridItem(.adaptive(minimum: 45), spacing: 4)
+    ]
+    
     var body: some View {
-        HStack(spacing: 8) {
-            
-            // 🛡 MARK: 1. シールドの表示（0より大きい時だけ、先頭に表示）
-            if shield > 0 {
-                StatusBadgeView(
-                    iconName: "shield.lefthalf.filled", // シールドは固定
-                    amount: shield,
-                    tintColor: .blue
-                )
-            }
-            
-            // ⚔️ MARK: 2. その他のバフ/デバフの表示
+        LazyVGrid(columns: columns, spacing: 4) {
             ForEach(activeStatuses, id: \.self) { status in
                 if let amount = statuses[status], amount > 0 {
                     // 🌟 StatusType が持っているプロパティを直接使う！
