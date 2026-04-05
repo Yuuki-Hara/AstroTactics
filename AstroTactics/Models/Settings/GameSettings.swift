@@ -61,12 +61,13 @@ struct GameSettings {
 
   // 🌟 アプリ起動時に一括で読み込む
   static func loadAll() {
-    if let loadData = DataLoader.load("GameSettings", as: GameSettingsData.self) {
+    do {
+      let loadData = try JSONLoader.load("GameSettings", as: GameSettingsData.self)
       config = loadData.config
       messages = loadData.messages
       print("✅ ゲーム設定（GameSettings.json）を統合して読み込みました！")
-    } else {
-      print("❌ GameSettingsの読み込みに失敗しました！")
+    } catch {
+      print("❌ GameSettingsの読み込みに失敗しました！ \(error)")
     }
   }
 }

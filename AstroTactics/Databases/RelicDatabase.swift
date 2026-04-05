@@ -29,9 +29,12 @@ struct RelicDatabase {
   static var allRelics: [Relic] = []
 
   static func loadFromJSON() {
-    if let catalog = DataLoader.load("RelicData", as: RelicCatalog.self) {
+    do {
+      let catalog = try JSONLoader.load("RelicData", as: RelicCatalog.self)
       allRelics = catalog.relics.compactMap { convert(json: $0) }
       print("✅ レリックデータを \(allRelics.count) 件読み込みました！")
+    } catch {
+      print("🚨 RelicDatabase: failed to load RelicData.json: \(error)")
     }
   }
 

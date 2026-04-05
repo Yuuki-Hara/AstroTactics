@@ -5,7 +5,7 @@
       "name": "エイリアン・スカウト",
       "imageName": "alien_scout",
       "maxHP": 18,
-      "ai": {
+      "behaviorAI": {
           "type": "random",
           "moves": [
               { "intent": "attack", "min": 4, "max": 6 },
@@ -18,7 +18,7 @@
       "name": "帝国軍・戦闘機",
       "imageName": "high_speed_drone",
       "maxHP": 25,
-      "ai": {
+      "behaviorAI": {
           "type": "random",
           "moves": [
               { "intent": "attack", "min": 6, "max": 9 },
@@ -31,7 +31,7 @@
       "name": "謎の遊撃艦",
       "imageName": "armored_cruiser",
       "maxHP": 22,
-      "ai": {
+      "behaviorAI": {
           "type": "random",
           "moves": [
               { "intent": "attack", "min": 8, "max": 10 },
@@ -42,9 +42,9 @@
     {
       "category": "boss",
       "name": "帝国軍 殲滅旗艦",
-      "imageName": "main_fleet",
+      "imageName": "mbehaviorAIn_fleet",
       "maxHP": 150,
-      "ai": {
+      "behaviorAI": {
           "type": "rotation",
           "moves": [
               { "intent": "charge" },

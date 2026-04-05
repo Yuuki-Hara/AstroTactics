@@ -138,9 +138,12 @@ class RunManager {
 
   // MARK: - JSONファイルの読み込み処理
   private func loadMapData() {
-    if let decodedData = DataLoader.load("MapData", as: MapData.self) {
+    do {
+      let decodedData = try JSONLoader.load("MapData", as: MapData.self)
       self.mapFloors = decodedData.floors
       print("✅ マップデータを読み込みました！")
+    } catch {
+      print("🚨 RunManager: failed to load MapData.json: \(error)")
     }
   }
 }

@@ -9,7 +9,8 @@ enum JSONLoaderError: Error, LocalizedError {
     switch self {
     case .fileNotFound(let name): return "JSON file not found: \(name).json"
     case .unreadableData(let name): return "Could not read data from: \(name).json"
-    case .decodingFailed(let name, let err): return "Failed to decode \(name).json: \(err.localizedDescription)"
+    case .decodingFailed(let name, let err):
+      return "Failed to decode \(name).json: \(err.localizedDescription)"
     }
   }
 }
